@@ -1,0 +1,23 @@
+I/ Tải code và push code lên github
+1.Tải responstory từ github về: git clone https://github.com/nguyenutc48/PiAGVPro.git
+2.Chỉnh sửa và lập trình ở bên trong folder đã tải về từ github: cd <> 
+3.Sau khi đã hoàn tất 1 công đoạn của lập trình chúng ta thực hiện commit
+	- Di chuyển vào thư mục vừa tải về từ github: cd <Tên folder của responstory>
+	- Update các file đã chỉnh sửa vào git local: git add . //Dấu chấm là tất cả các file trong folder
+	- Thực hiện commit vào trong git local:       git commit -m "<Note lại công việc đã xong>"
+	- Nếu không có lỗi thì commit đã xong
+4.Đưa code lên trên remote host github.com:
+	- Kiểm tra con trỏ có trong thư mục responstory chưa nếu chưa phải di chuyển vào: cd <Tên folder của responstory>
+	- Đưa code lên github.com: git push
+	- Nhập user và password của mình ở trên github. 
+II/ Update code của những người khác về từ github.com
+	- Di chuyển vào thư mục đã clone về từ github:  cd <Tên folder của responstory>
+	- Thực hiện kéo code mới nhất từ github.com về: git pull
+	- Nếu không có lỗi thông báo thì code mới đã về đến thư mục.
+III/ Chuyển đổi branch sử dụng để lập trình
+	- Tạo brach mới trên responstory ở github.com
+	- Di chuyển vào thư mục responstory: cd <Tên folder của responstory>
+	- Update branch mới về:		     git pull
+	- Thực hiện chuyển sang branch mới để làm việc: git checkout <Tên branch muốn chuyển sang>
+	- Để kiểm tra xem branch hiện tại dùng lệnh: git branch -a //Branch hiện tại có màu green
+IV/ Nhóm AGV thống nhất sử dụng branch "master" để phát triển
