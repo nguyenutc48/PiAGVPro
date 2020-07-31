@@ -3,6 +3,10 @@
 
 #include "pirfidreader_global.h"
 #include <QThread>
+#include <QSerialPort>
+#include <QMutex>
+#include <QElapsedTimer>
+#include <QDebug>
 
 
 class PIRFIDREADERSHARED_EXPORT PiRFIDReader : public QThread
@@ -19,8 +23,8 @@ class PIRFIDREADERSHARED_EXPORT PiRFIDReader : public QThread
 //*******************************LIST STATE************************************************//
     enum{
         RUNNING,
-        CONNECTED,
-        DISCONNECTED,
+        OPENED,
+        CLOSED,
         TIMEOUT,
         ERROR
     }State;
@@ -54,6 +58,12 @@ public:
     QString     dataCard();
 
 
+//************************************PUBLIC SLOTS*****************************************//
+public slots:
+    //start reader
+    void ReaderStart();
+    void ReaderStop();
+
 //************************************SIGNALS**********************************************//
 signals:
     //Khi trang thai thay doi
@@ -73,13 +83,30 @@ private:
     void setLog(QString);
     //Set rfid card
     void setDataCard(QString);
+    //Serial port connect
+    bool serialPortOpen();
+    //close
+    void serialPortClose();
+    //set state log
+    void setStateLog(int,QString);
 
-//***********************************PRIVATE FUNCTIONS*************************************//
+
+
+//***********************************PRIVATE*************************************//
 private:
     //Lua ma RFID cu
-    QString     m_oldCard;
+    QString         m_oldCard;
     //Bien dung scan the rfid
-    bool        m_stopScan;
+    bool            m_stopScan;
+    // Serial port pointer
+    QSerialPort     *serial;
+    //Time count check delay
+    QElapsedTimer   m_timeNextCard;
+    //Check frame flag
+    int             m_checkHeader;
+    //Data card temp
+    QString         m_dataCardTemp;
+
 
 //***********************************STATIC PRIVATE****************************************//
 private:
@@ -91,6 +118,11 @@ private:
     static      QString     m_log;
     //The hien tai
     static      QString     m_dataCard;
+
+//***********************************PRIVATE SLOTS****************************************//
+private slots:
+    //read data from serial port
+    void readyRead();
 
 
 };
