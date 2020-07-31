@@ -20,4 +20,4 @@ III/ Chuyển đổi branch sử dụng để lập trình
 	- Update branch mới về:		     git pull
 	- Thực hiện chuyển sang branch mới để làm việc: git checkout <Tên branch muốn chuyển sang>
 	- Để kiểm tra xem branch hiện tại dùng lệnh: git branch -a //Branch hiện tại có màu green
-IV/ Nhóm AGV thống nhất sử dụng branch "master" để phát triển 
+IV/ Nhóm AGV thống nhất sử dụng branch "master" để phát triển  
