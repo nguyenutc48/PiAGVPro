@@ -7,7 +7,7 @@
 namespace Ui {
 class Application;
 }
-
+class QStandardItemModel;
 class Application : public QMainWindow
 {
     Q_OBJECT
@@ -31,6 +31,7 @@ private:
     Ui::Application *ui;
 private:
     static PiFileHelper _m_PiFileHelper;
+    QStandardItemModel *mModel;
 };
 
 #endif // APPLICATION_H

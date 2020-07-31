@@ -12,13 +12,13 @@ bool PiFileHelper::SetValueSetting(QString qstrFileName, QString qstrGroup, QStr
     {
         return false;
     }
-    if(!QFile(QString::fromLatin1("/home/pi/PiAGVPro/Settings/") + qstrFileName + ".ini").exists())
+    if(!QFile(QString::fromLatin1("/home/pi/PiAGVPro/Settings/") + qstrFileName).exists())
     {
         return false;
     }
     try
     {
-        QSettings settings(QString::fromLatin1("/home/pi/PiAGVPro/Settings/") + qstrFileName + ".ini", QSettings::IniFormat);
+        QSettings settings(QString::fromLatin1("/home/pi/PiAGVPro/Settings/") + qstrFileName, QSettings::IniFormat);
         settings.beginGroup(qstrGroup);
         if(!settings.contains(qstrKey))
         {
@@ -42,26 +42,26 @@ QString PiFileHelper::GetValueSetting(QString qstrFileName, QString qstrGroup, Q
             {
                 return "ERROR";
             }
-            if(!QFile(QString::fromLatin1("/home/pi/PiAGVPro/Settings/") + qstrFileName + ".ini").exists())
+            if(!QFile(QString::fromLatin1("/home/pi/PiAGVPro/Settings/") + qstrFileName).exists())
             {
-                return "ERROR";
+                return "path incorectly";
             }
             QString qResult = "";
             try
             {
-                QSettings settings(QString::fromLatin1("/home/pi/PiAGVPro/Settings/") + qstrFileName + ".ini", QSettings::IniFormat);
+                QSettings settings(QString::fromLatin1("/home/pi/PiAGVPro/Settings/") + qstrFileName, QSettings::IniFormat);
                 settings.beginGroup(qstrGroup);
                 if(!settings.contains(qstrKey))
                 {
                     settings.endGroup();
-                    return "ERROR";
+                    return "1";
                 }
                 qResult = settings.value(qstrKey).toString();
                 settings.endGroup();
             }
             catch (QException &)
             {
-                return "ERROR";
+                return "ex";
             }
             qResult = qResult.trimmed();
             return qResult;

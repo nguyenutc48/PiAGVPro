@@ -35,7 +35,8 @@ HEADERS += \
 
 FORMS += \
         Application.ui
-
+#Add them
+QMAKE_CXXFLAGS +=-std=gnu++14
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
