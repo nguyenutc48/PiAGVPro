@@ -14,7 +14,6 @@ PiRFIDReader::PiRFIDReader(QObject *_parent, QString _port, int _baudrate, int _
     timeOut(_timeout),
     timeNextCard(_timenextcard)
 {
-    m_stopScan = false;
 }
 
 PiRFIDReader::~PiRFIDReader()
@@ -35,6 +34,7 @@ QString PiRFIDReader::log()
 
 void PiRFIDReader::ReaderStart()
 {
+    this->m_stopScan = false;
     this->start();
 }
 

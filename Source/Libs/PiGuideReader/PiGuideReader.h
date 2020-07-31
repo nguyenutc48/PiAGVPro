@@ -26,7 +26,7 @@ class PIGUIDEREADERSHARED_EXPORT PiGuideReader : public QThread
 
 public:
 //******************************CONTRUCTOR*************************************************//
-    PiGuideReader(QObject *_parent = nullptr, QString _port = "", int _baudrate = 115200, int _timeout= 3000, int _timeoutguide = 1000);
+    PiGuideReader(QObject *_parent = nullptr, QString _port = "", int _baudrate = 115200, int _timeout= 3000);
     ~PiGuideReader();
 
 //***********************************PUBLIC VAILABLE**************************************//
