@@ -21,3 +21,16 @@ III/ Chuyển đổi branch sử dụng để lập trình
 	- Thực hiện chuyển sang branch mới để làm việc: git checkout <Tên branch muốn chuyển sang>
 	- Để kiểm tra xem branch hiện tại dùng lệnh: git branch -a //Branch hiện tại có màu green
 IV/ Nhóm AGV thống nhất sử dụng branch "master" để phát triển  
+V/ Cac buoc dung ssh key voi github
+mkdir .ssh
+cd .ssh
+touch authorized_keys
+chmod 700 ~/.ssh/
+chmod 600 ~/.ssh/authorized_keys
+ssh-keygen -t rsa -C "ngvan.nguyen164@gmail.com" -> dat ten "id_rsa" va password cua chuoi
+Copy du lieu ben trong file id_rsa.pub len tren git hub
+eval "$(ssh-agent -s)" //enable 1 cai gi do noi chung la bat buoc
+ssh-add ~/.ssh/id_rsa
+
+
+
