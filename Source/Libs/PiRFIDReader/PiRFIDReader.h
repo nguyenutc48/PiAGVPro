@@ -122,7 +122,7 @@ private:
 //***********************************PRIVATE SLOTS****************************************//
 private slots:
     //read data from serial port
-    void readyRead();
+    void readData();
 
 
 };

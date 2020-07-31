@@ -41,6 +41,8 @@ void PiRFIDReader::ReaderStart()
 void PiRFIDReader::ReaderStop()
 {
     this->m_stopScan = true;
+    disconnect(serial, SIGNAL(readyRead()), this, SLOT(readData()));
+    this->serialPortClose();
 }
 
 void PiRFIDReader::run()
@@ -53,6 +55,7 @@ void PiRFIDReader::run()
         //Check connection time out
         while(timer.elapsed()< timeOut)
         {
+            m_oneScan = 1;
             if(serialPortOpen())
             {
                 connect(serial, SIGNAL(readyRead()), this, SLOT(readData()));
@@ -61,10 +64,10 @@ void PiRFIDReader::run()
             }
             else {
                 serialPortClose();
-
             }
         }
-        setStateLog(TIMEOUT,serialPort+" open is time out");
+        m_oneScan = 0;
+        setStateLog(TIMEOUT, serialPort+" open is time out");
     }
     else
     {
@@ -127,7 +130,7 @@ void PiRFIDReader::setStateLog(int state, QString log)
     setLog(log);
 }
 
-void PiRFIDReader::readyRead()
+void PiRFIDReader::readData()
 {
     if(this->m_stopScan == false)
     {

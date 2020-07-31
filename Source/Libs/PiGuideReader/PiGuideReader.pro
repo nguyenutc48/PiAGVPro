@@ -5,6 +5,7 @@
 #-------------------------------------------------
 
 QT       -= gui
+QT       += serialport
 
 TARGET = PiGuideReader
 TEMPLATE = lib
