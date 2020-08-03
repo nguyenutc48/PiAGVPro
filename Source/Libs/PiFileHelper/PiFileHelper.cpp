@@ -40,11 +40,11 @@ QString PiFileHelper::GetValueSetting(QString qstrFileName, QString qstrGroup, Q
     QMutexLocker locker(&_mutex_FileHelper);
             if(qstrFileName.size() <= 0 || qstrGroup.size() <= 0 || qstrKey.size() <= 0)
             {
-                return "ERROR";
+                return "Input FileName or Group or Key ERROR";
             }
             if(!QFile(QString::fromLatin1("/home/pi/PiAGVPro/Settings/") + qstrFileName + ".ini").exists())
             {
-                return "path incorectly";
+                return "Path Incorectly";
             }
             QString qResult = "";
             try
@@ -54,7 +54,7 @@ QString PiFileHelper::GetValueSetting(QString qstrFileName, QString qstrGroup, Q
                 if(!settings.contains(qstrKey))
                 {
                     settings.endGroup();
-                    return "1";
+                    return "Input Key Error";
                 }
                 qResult = settings.value(qstrKey).toString();
                 settings.endGroup();
@@ -74,7 +74,7 @@ QStringList PiFileHelper::GetListValueSetting(QString qstrFileName, QString qstr
     QStringList     listValueResult;
     if(qstrFileName.size() <= 0 || qstrGroup.size() <= 0 || qstrKey.size() <= 0)
     {
-        qResult = "ERROR_";
+        qResult = "Input FileName or Group or Key ERROR";
     }
     else
     {
@@ -87,7 +87,7 @@ QStringList PiFileHelper::GetListValueSetting(QString qstrFileName, QString qstr
                 if(!settings.contains(qstrKey))
                 {
                     settings.endGroup();
-                    qResult = "ERROR_";
+                    qResult = "Input Key Error";
                 }
                 else
                 {
@@ -102,7 +102,7 @@ QStringList PiFileHelper::GetListValueSetting(QString qstrFileName, QString qstr
         }
         else
         {
-            qResult = "ERROR_";
+            qResult = "Path Incorectly";
         }
     }
     qResult = qResult.trimmed();

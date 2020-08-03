@@ -33,12 +33,15 @@ private slots:
 
     void on_actionClose_triggered();
 
+    void on_actionNew_triggered();
+
 private:
     Ui::Application *ui;
 private:
     static PiFileHelper _m_PiFileHelper;
     QStandardItemModel *mModel;
     void setValueAt(int ix,int jx,const QString &value);
+    QString getValueAt(int ix, int jx);
 };
 
 #endif // APPLICATION_H

@@ -32,6 +32,7 @@ public:
     QAction *actionOpen;
     QAction *actionSave;
     QAction *actionClose;
+    QAction *actionNew;
     QWidget *centralWidget;
     QPushButton *BntReadFileini;
     QPushButton *BntWriteFileini;
@@ -57,6 +58,8 @@ public:
         actionSave->setObjectName(QStringLiteral("actionSave"));
         actionClose = new QAction(Application);
         actionClose->setObjectName(QStringLiteral("actionClose"));
+        actionNew = new QAction(Application);
+        actionNew->setObjectName(QStringLiteral("actionNew"));
         centralWidget = new QWidget(Application);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         BntReadFileini = new QPushButton(centralWidget);
@@ -100,6 +103,7 @@ public:
         menuBar->addAction(menuOpen->menuAction());
         menuOpen->addSeparator();
         menuOpen->addSeparator();
+        menuOpen->addAction(actionNew);
         menuOpen->addAction(actionOpen);
         menuOpen->addAction(actionSave);
         menuOpen->addAction(actionClose);
@@ -115,6 +119,7 @@ public:
         actionOpen->setText(QApplication::translate("Application", "Open", nullptr));
         actionSave->setText(QApplication::translate("Application", "Save", nullptr));
         actionClose->setText(QApplication::translate("Application", "Close", nullptr));
+        actionNew->setText(QApplication::translate("Application", "New", nullptr));
         BntReadFileini->setText(QApplication::translate("Application", "ReadFIle.ini", nullptr));
         BntWriteFileini->setText(QApplication::translate("Application", "WriteFIle.ini", nullptr));
         BntReadFilecsv->setText(QApplication::translate("Application", "ReadFIle.csv", nullptr));
