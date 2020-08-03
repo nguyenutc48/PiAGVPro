@@ -2,14 +2,13 @@
 #define PIRFIDREADER_H
 
 #include "pirfidreader_global.h"
-#include <QThread>
 #include <QSerialPort>
 #include <QMutex>
 #include <QElapsedTimer>
 #include <QDebug>
 
 
-class PIRFIDREADERSHARED_EXPORT PiRFIDReader : public QThread
+class PIRFIDREADERSHARED_EXPORT PiRFIDReader : public QObject
 {
     Q_OBJECT
 //*******************************PROPERTIES***********************************************//
@@ -75,8 +74,6 @@ signals:
 
 //***********************************PRIVATE FUNCTIONS*************************************//
 private:
-    //Bat dau thread
-    void run() override;
     //Set trang thai
     void setState(int);
     //Set log

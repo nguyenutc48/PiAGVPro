@@ -8,7 +8,7 @@
 #include <QElapsedTimer>
 #include <QDebug>
 
-class PIGUIDEREADERSHARED_EXPORT PiGuideReader : public QThread
+class PIGUIDEREADERSHARED_EXPORT PiGuideReader : public QObject
 {
     Q_OBJECT
 //*******************************PROPERTIES***********************************************//
@@ -61,7 +61,6 @@ signals:
 
 //***********************************PRIVATE FUNCTIONS*************************************//
 private:
-    void run() override;            //Bat dau thread
     void setState(int);             //Set trang thai
     void setLog(QString);           //Set log
     void setDataGuide(int);         //Set guide index
