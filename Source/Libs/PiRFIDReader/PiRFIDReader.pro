@@ -3,7 +3,6 @@
 # Project created by QtCreator 2020-07-23T13:16:12
 #
 #-------------------------------------------------
-
 QT       -= gui
 QT       += serialport
 

@@ -16,11 +16,7 @@ PiRFIDReader::PiRFIDReader(QObject *_parent, QString _port, int _baudrate, int _
 {
 }
 
-PiRFIDReader::~PiRFIDReader()
-{
-    disconnect(serial, SIGNAL(readyRead()), this, SLOT(readData()));
-    serialPortClose();
-}
+
 
 int PiRFIDReader::state()
 {
@@ -44,7 +40,7 @@ void PiRFIDReader::ReaderStart()
     {
         QElapsedTimer timer;
         timer.start();
-
+        int temp = 0;
         //Check connection time out
         while(timer.elapsed()< timeOut)
         {
@@ -53,6 +49,7 @@ void PiRFIDReader::ReaderStart()
             {
                 connect(serial, SIGNAL(readyRead()), this, SLOT(readData()));
                 setStateLog(RUNNING,"Reader is running");
+                temp = 1;
                 break;
             }
             else {
@@ -60,7 +57,8 @@ void PiRFIDReader::ReaderStart()
             }
         }
         m_oneScan = 0;
-        setStateLog(TIMEOUT, serialPort+" open is time out");
+        if(temp = 0)
+            setStateLog(TIMEOUT, serialPort+" open is time out");
     }
     else
     {
@@ -95,6 +93,7 @@ void PiRFIDReader::setDataCard(QString data)
 
 bool PiRFIDReader::serialPortOpen()
 {
+    serial = new QSerialPort();
     serial->setPortName(serialPort);
 
     if (serial->open(QIODevice::ReadWrite))

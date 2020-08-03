@@ -6,7 +6,7 @@
 #include <QSerialPort>
 #include <QMutex>
 #include <QElapsedTimer>
-#include <QDebug>
+#include <QObject>
 
 class PIGUIDEREADERSHARED_EXPORT PiGuideReader : public QObject
 {

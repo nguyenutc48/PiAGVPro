@@ -25,15 +25,14 @@ Application::~Application()
 PiFileHelper Application::_m_PiFileHelper;
 void Application::on_BntReadFileini_clicked()
 {
-    QString Showdata =_m_PiFileHelper.GetValueSetting("aaa.csv"
-                                                      "","Input","Index");
+    QString Showdata =_m_PiFileHelper.GetValueSetting("SetIPServer","IP_SERVER","IP");
     ui->PlanTextEdit->setPlainText(Showdata);
 }
 
 void Application::on_BntWriteFileini_clicked()
 {
     QString xx= ui->lineEdit->text();
-    _m_PiFileHelper.SetValueSetting("aaa.ini","Input","Index",xx);
+    _m_PiFileHelper.SetValueSetting("aaa","Input","Index",xx);
 }
 
 void Application::on_BntReadFilecsv_clicked()
@@ -53,7 +52,7 @@ void Application::on_BntReadAllini_clicked()
 
 void Application::on_actionOpen_triggered()
 {
-    auto filename=QFileDialog::getOpenFileName(this,"aaa",QDir::rootPath(),"CSV File (*.csv)");
+    auto filename=QFileDialog::getOpenFileName(this,"PiAGVPro",QDir::rootPath(),"CSV File (*.csv)");
     if(filename.isEmpty())
     {
         return;
@@ -65,8 +64,9 @@ void Application::on_actionOpen_triggered()
     }
     QTextStream xin(&file);
     int ix=0;
-    while (xin.atEnd())
+    while (!xin.atEnd())
     {
+        mModel->setRowCount(ix);
         auto line =xin.readLine();
         auto values=line.split(",");
         const int colCount=values.size();
@@ -82,15 +82,30 @@ void Application::on_actionOpen_triggered()
 
 void Application::on_actionSave_triggered()
 {
-    SelectDialog select(this);
-    if (select.exec()==QDialog::Rejected)
+    auto filename = QFileDialog::getSaveFileName(this,"aaaNew",QDir::rootPath(),"CSV File (*.csv)");
+    if (filename.isEmpty())
     {
         return;
     }
-    const int rowCOunt=select.getRowCount();
-    const int colCount=select.getColCount();
-    mModel->setRowCount(rowCOunt);
-    mModel->setColumnCount(colCount);
+    QFile file(filename);
+    if(!file.open(QIODevice::WriteOnly|QIODevice::Text))
+    {
+        return;
+    }
+    QTextStream xout(&file);
+    const int rowCount=mModel->rowCount();
+    const int colCount=mModel->columnCount();
+    for (int ix=0;ix<rowCount;++ix)
+    {
+        xout << getValueAt(ix,0);
+        for (int jx=1;jx<colCount;++jx)
+        {
+            xout << "," << getValueAt(ix,jx);
+        }
+        xout<< "\n";
+    }
+    file.flush();
+    file.close();
 }
 
 void Application::on_actionClose_triggered()
@@ -108,4 +123,29 @@ void Application::setValueAt(int ix, int jx, const QString &value)
     {
         mModel->item(ix,jx)->setText(value);
     }
+}
+
+QString Application::getValueAt(int ix, int jx)
+{
+    if(!mModel->item(ix,jx))
+    {
+        return "";
+    }
+    else
+    {
+        return  mModel->item(ix,jx)->text();
+    }
+}
+
+void Application::on_actionNew_triggered()
+{
+    SelectDialog select(this);
+    if (select.exec()==QDialog::Rejected)
+    {
+        return;
+    }
+    const int rowCOunt=select.getRowCount();
+    const int colCount=select.getColCount();
+    mModel->setRowCount(rowCOunt);
+    mModel->setColumnCount(colCount);
 }
