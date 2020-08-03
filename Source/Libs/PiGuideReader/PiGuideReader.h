@@ -3,6 +3,10 @@
 
 #include "piguidereader_global.h"
 #include <QThread>
+#include <QSerialPort>
+#include <QMutex>
+#include <QElapsedTimer>
+#include <QDebug>
 
 class PIGUIDEREADERSHARED_EXPORT PiGuideReader : public QThread
 {
@@ -18,75 +22,67 @@ class PIGUIDEREADERSHARED_EXPORT PiGuideReader : public QThread
 //*******************************LIST STATE************************************************//
     enum{
         RUNNING,
-        CONNECTED,
-        DISCONNECTED,
+        OPENED,
+        CLOSED,
         TIMEOUT,
         ERROR
     }State;
 
 public:
 //******************************CONTRUCTOR*************************************************//
-    PiGuideReader(QObject *_parent = nullptr, QString _port = "", int _baudrate = 115200, int _timeout= 3000, int _timeoutguide = 1000);
+    PiGuideReader(QObject *_parent = nullptr, QString _port = "", int _baudrate = 115200, int _timeout= 3000);
     ~PiGuideReader();
 
 //***********************************PUBLIC VAILABLE**************************************//
 public:
-    //Cong ket noi
-    QString     serialPort;
-    //Toc do truyen
-    int         baudRate;
-    //Thoi gian time out
-    int         timeOut;
-    //Thoi gian out guide cho phep
-    int         timeOutGuide;
-    //Trang thai dang co the
-    bool        onGuide;
+    QString     serialPort;         //Cong ket noi
+    int         baudRate;           //Toc do truyen
+    int         timeOut;            //Thoi gian time out
+    int         timeOutGuide;       //Thoi gian out guide cho phep
+    bool        onGuide;            //Trang thai dang co the
 
 //***********************************PUBLIC FUNCTIONS**************************************//
 public:
-    //Lay trang thai hien tai
-    int         state();
-    //Lay log hien tai
-    QString     log();
-    //Lay ma the doc duoc hien tai
-    int     dataGuide();
+    int         state();            //Lay trang thai hien tai
+    QString     log();              //Lay log hien tai
+    int     dataGuide();            //Lay ma the doc duoc hien tai
 
+//************************************PUBLIC SLOTS*****************************************//
+public slots:
+    //start reader
+    void ReaderStart();
+    void ReaderStop();
 
 //************************************SIGNALS**********************************************//
 signals:
-    //Khi trang thai thay doi
-    void stateChanged(int);
-    //Khi log thay doi
-    void logChanged(QString);
-    //Khi the thay doi
-    void dataGuideChanged(int);
+    void stateChanged(int);         //Khi trang thai thay doi
+    void logChanged(QString);       //Khi log thay doi
+    void dataGuideChanged(int);     //Khi the thay doi
 
 //***********************************PRIVATE FUNCTIONS*************************************//
 private:
-    //Bat dau thread
-    void run() override;
-    //Set trang thai
-    void setState(int);
-    //Set log
-    void setLog(QString);
-    //Set rfid card
-    void setDataGuide(QString);
+    void run() override;            //Bat dau thread
+    void setState(int);             //Set trang thai
+    void setLog(QString);           //Set log
+    void setDataGuide(int);         //Set guide index
+    bool serialPortOpen();          //Serial port connect
+    void serialPortClose();         //close
+    void setStateLog(int,QString);  //set state log
 
 //***********************************PRIVATE FUNCTIONS*************************************//
 private:
-    //Bien dung scan the rfid
-    bool        m_stopScan;
+    bool            m_stopScan;     //Bien dung scan the rfid
+    QSerialPort     *serial;        // Serial port pointer
 
 //***********************************STATIC PRIVATE****************************************//
 private:
-    //Khoa trang thai chi cho 1 thread scan the rfid
-    static      int         m_oneScan;
-    //Trang thai cua thread
-    static      int         m_state;
-    //Log hien tai
-    static      QString     m_log;
-    //The hien tai
-    static      QString     m_dataGuide;
+    static      int         m_oneScan;      //Khoa trang thai chi cho 1 thread scan the rfid
+    static      int         m_state;        //Trang thai cua thread
+    static      QString     m_log;          //Log hien tai
+    static      int         m_dataGuide;    //The hien tai
+
+private slots:
+    void readData();
 
 };
 
