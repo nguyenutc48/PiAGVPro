@@ -12,10 +12,10 @@ MAKEFILE      = Makefile
 
 CC            = gcc
 CXX           = g++
-DEFINES       = -DPIGUIDEREADER_LIBRARY -DQT_DEPRECATED_WARNINGS -DQT_QML_DEBUG -DQT_CORE_LIB
+DEFINES       = -DPIGUIDEREADER_LIBRARY -DQT_DEPRECATED_WARNINGS -DQT_QML_DEBUG -DQT_SERIALPORT_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -g -Wall -W -D_REENTRANT -fPIC $(DEFINES)
 CXXFLAGS      = -pipe -g -Wall -W -D_REENTRANT -fPIC $(DEFINES)
-INCPATH       = -I. -isystem /usr/include/arm-linux-gnueabihf/qt5 -isystem /usr/include/arm-linux-gnueabihf/qt5/QtCore -I. -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++
+INCPATH       = -I. -isystem /usr/include/arm-linux-gnueabihf/qt5 -isystem /usr/include/arm-linux-gnueabihf/qt5/QtSerialPort -isystem /usr/include/arm-linux-gnueabihf/qt5/QtCore -I. -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++
 QMAKE         = /usr/lib/qt5/bin/qmake
 DEL_FILE      = rm -f
 CHK_DIR_EXISTS= test -d
@@ -38,7 +38,7 @@ DISTNAME      = PiGuideReader1.0.0
 DISTDIR = /home/pi/PiAGVPro/Source/Libs/PiGuideReader/.tmp/PiGuideReader1.0.0
 LINK          = g++
 LFLAGS        = -shared -Wl,-soname,libPiGuideReader.so.1
-LIBS          = $(SUBLIBS) -lQt5Core -lpthread -latomic 
+LIBS          = $(SUBLIBS) -lQt5SerialPort -lQt5Core -lpthread -latomic 
 AR            = ar cqs
 RANLIB        = 
 SED           = sed
@@ -50,8 +50,9 @@ OBJECTS_DIR   = ./
 
 ####### Files
 
-SOURCES       = PiGuideReader.cpp 
-OBJECTS       = PiGuideReader.o
+SOURCES       = PiGuideReader.cpp moc_PiGuideReader.cpp
+OBJECTS       = PiGuideReader.o \
+		moc_PiGuideReader.o
 DIST          = /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/common/unix.conf \
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/common/linux.conf \
@@ -119,6 +120,7 @@ DIST          = /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/qt_config.prf \
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++/qmake.conf \
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/spec_post.prf \
+		.qmake.stash \
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/exclusive_builds.prf \
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/toolchain.prf \
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/default_pre.prf \
@@ -233,6 +235,7 @@ Makefile: PiGuideReader.pro /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++/q
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/qt_config.prf \
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++/qmake.conf \
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/spec_post.prf \
+		.qmake.stash \
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/exclusive_builds.prf \
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/toolchain.prf \
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/default_pre.prf \
@@ -251,6 +254,7 @@ Makefile: PiGuideReader.pro /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++/q
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/yacc.prf \
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/lex.prf \
 		PiGuideReader.pro \
+		/usr/lib/arm-linux-gnueabihf/libQt5SerialPort.prl \
 		/usr/lib/arm-linux-gnueabihf/libQt5Core.prl
 	$(QMAKE) -o Makefile PiGuideReader.pro -spec linux-g++ CONFIG+=debug CONFIG+=qml_debug
 /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/spec_pre.prf:
@@ -320,6 +324,7 @@ Makefile: PiGuideReader.pro /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++/q
 /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/qt_config.prf:
 /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++/qmake.conf:
 /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/spec_post.prf:
+.qmake.stash:
 /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/exclusive_builds.prf:
 /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/toolchain.prf:
 /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/default_pre.prf:
@@ -338,6 +343,7 @@ Makefile: PiGuideReader.pro /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++/q
 /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/yacc.prf:
 /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/lex.prf:
 PiGuideReader.pro:
+/usr/lib/arm-linux-gnueabihf/libQt5SerialPort.prl:
 /usr/lib/arm-linux-gnueabihf/libQt5Core.prl:
 qmake: FORCE
 	@$(QMAKE) -o Makefile PiGuideReader.pro -spec linux-g++ CONFIG+=debug CONFIG+=qml_debug
@@ -388,8 +394,15 @@ compiler_moc_predefs_clean:
 moc_predefs.h: /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/data/dummy.cpp
 	g++ -pipe -g -Wall -W -dM -E -o moc_predefs.h /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/data/dummy.cpp
 
-compiler_moc_header_make_all:
+compiler_moc_header_make_all: moc_PiGuideReader.cpp
 compiler_moc_header_clean:
+	-$(DEL_FILE) moc_PiGuideReader.cpp
+moc_PiGuideReader.cpp: piguidereader_global.h \
+		PiGuideReader.h \
+		moc_predefs.h \
+		/usr/lib/qt5/bin/moc
+	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/pi/PiAGVPro/Source/Libs/PiGuideReader/moc_predefs.h -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/pi/PiAGVPro/Source/Libs/PiGuideReader -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtSerialPort -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/8 -I/usr/include/arm-linux-gnueabihf/c++/8 -I/usr/include/c++/8/backward -I/usr/lib/gcc/arm-linux-gnueabihf/8/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/8/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include PiGuideReader.h -o moc_PiGuideReader.cpp
+
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
 compiler_moc_source_make_all:
@@ -400,13 +413,16 @@ compiler_yacc_impl_make_all:
 compiler_yacc_impl_clean:
 compiler_lex_make_all:
 compiler_lex_clean:
-compiler_clean: compiler_moc_predefs_clean 
+compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean 
 
 ####### Compile
 
 PiGuideReader.o: PiGuideReader.cpp PiGuideReader.h \
 		piguidereader_global.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o PiGuideReader.o PiGuideReader.cpp
+
+moc_PiGuideReader.o: moc_PiGuideReader.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_PiGuideReader.o moc_PiGuideReader.cpp
 
 ####### Install
 
