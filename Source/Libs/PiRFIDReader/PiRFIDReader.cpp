@@ -8,7 +8,7 @@ QString     PiRFIDReader::m_dataCard;
 
 
 PiRFIDReader::PiRFIDReader(QObject *_parent, QString _port, int _baudrate, int _timeout, int _timenextcard) :
-    QThread(_parent),
+    QObject(_parent),
     serialPort(_port),
     baudRate(_baudrate),
     timeOut(_timeout),
@@ -35,18 +35,6 @@ QString PiRFIDReader::log()
 void PiRFIDReader::ReaderStart()
 {
     this->m_stopScan = false;
-    this->start();
-}
-
-void PiRFIDReader::ReaderStop()
-{
-    this->m_stopScan = true;
-    disconnect(serial, SIGNAL(readyRead()), this, SLOT(readData()));
-    this->serialPortClose();
-}
-
-void PiRFIDReader::run()
-{
     if(m_oneScan != 1)
     {
         QElapsedTimer timer;
@@ -73,6 +61,13 @@ void PiRFIDReader::run()
     {
         setLog("Device has connected");
     }
+}
+
+void PiRFIDReader::ReaderStop()
+{
+    this->m_stopScan = true;
+    disconnect(serial, SIGNAL(readyRead()), this, SLOT(readData()));
+    this->serialPortClose();
 }
 
 void PiRFIDReader::setState(int data)

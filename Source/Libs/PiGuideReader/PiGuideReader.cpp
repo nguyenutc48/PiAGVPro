@@ -2,7 +2,7 @@
 
 
 PiGuideReader::PiGuideReader(QObject *_parent, QString _port, int _baudrate, int _timeout):
-    QThread(_parent),
+    QObject (_parent),
     serialPort(_port),
     baudRate(_baudrate),
     timeOut(_timeout)
@@ -28,18 +28,6 @@ int PiGuideReader::dataGuide()
 void PiGuideReader::ReaderStart()
 {
     this->m_stopScan = false;
-    this->start();
-}
-
-void PiGuideReader::ReaderStop()
-{
-    this->m_stopScan = true;
-    disconnect(serial, SIGNAL(readyRead()), this, SLOT(readData()));
-    this->serialPortClose();
-}
-
-void PiGuideReader::run()
-{
     if(m_oneScan != 1)
     {
         QElapsedTimer timer;
@@ -57,7 +45,6 @@ void PiGuideReader::run()
                 {
                     serial->clear();
                     serial->write("\002A1\003");
-                    this->msleep(100);
                 }
             }
             else {
@@ -71,6 +58,13 @@ void PiGuideReader::run()
     {
         setLog("Device has connected");
     }
+}
+
+void PiGuideReader::ReaderStop()
+{
+    this->m_stopScan = true;
+    disconnect(serial, SIGNAL(readyRead()), this, SLOT(readData()));
+    this->serialPortClose();
 }
 
 void PiGuideReader::setState(int data)
