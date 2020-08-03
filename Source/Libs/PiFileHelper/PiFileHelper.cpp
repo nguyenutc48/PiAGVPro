@@ -12,13 +12,13 @@ bool PiFileHelper::SetValueSetting(QString qstrFileName, QString qstrGroup, QStr
     {
         return false;
     }
-    if(!QFile(QString::fromLatin1("/home/pi/PiAGVPro/Settings/") + qstrFileName).exists())
+    if(!QFile(QString::fromLatin1("/home/pi/PiAGVPro/Settings/") + qstrFileName + ".ini").exists())
     {
         return false;
     }
     try
     {
-        QSettings settings(QString::fromLatin1("/home/pi/PiAGVPro/Settings/") + qstrFileName, QSettings::IniFormat);
+        QSettings settings(QString::fromLatin1("/home/pi/PiAGVPro/Settings/") + qstrFileName + ".ini", QSettings::IniFormat);
         settings.beginGroup(qstrGroup);
         if(!settings.contains(qstrKey))
         {
@@ -42,14 +42,14 @@ QString PiFileHelper::GetValueSetting(QString qstrFileName, QString qstrGroup, Q
             {
                 return "ERROR";
             }
-            if(!QFile(QString::fromLatin1("/home/pi/PiAGVPro/Settings/") + qstrFileName).exists())
+            if(!QFile(QString::fromLatin1("/home/pi/PiAGVPro/Settings/") + qstrFileName + ".ini").exists())
             {
                 return "path incorectly";
             }
             QString qResult = "";
             try
             {
-                QSettings settings(QString::fromLatin1("/home/pi/PiAGVPro/Settings/") + qstrFileName, QSettings::IniFormat);
+                QSettings settings(QString::fromLatin1("/home/pi/PiAGVPro/Settings/") + qstrFileName + ".ini", QSettings::IniFormat);
                 settings.beginGroup(qstrGroup);
                 if(!settings.contains(qstrKey))
                 {

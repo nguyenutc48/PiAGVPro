@@ -51,10 +51,14 @@ OBJECTS_DIR   = ./
 ####### Files
 
 SOURCES       = main.cpp \
-		Application.cpp moc_Application.cpp
+		Application.cpp \
+		selectdialog.cpp moc_Application.cpp \
+		moc_selectdialog.cpp
 OBJECTS       = main.o \
 		Application.o \
-		moc_Application.o
+		selectdialog.o \
+		moc_Application.o \
+		moc_selectdialog.o
 DIST          = /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/common/unix.conf \
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/common/linux.conf \
@@ -139,8 +143,10 @@ DIST          = /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/lex.prf \
 		Application.pro Application.h \
 		../PiFileHelper/PiFileHelper.h \
-		../PiFileHelper/pifilehelper_global.h main.cpp \
-		Application.cpp
+		../PiFileHelper/pifilehelper_global.h \
+		selectdialog.h main.cpp \
+		Application.cpp \
+		selectdialog.cpp
 QMAKE_TARGET  = Application
 DESTDIR       = 
 TARGET        = Application
@@ -149,7 +155,7 @@ TARGET        = Application
 first: all
 ####### Build rules
 
-$(TARGET): ui_Application.h $(OBJECTS)  
+$(TARGET): ui_Application.h ui_selectdialog.h $(OBJECTS)  
 	$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS)
 
 Makefile: Application.pro /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++/qmake.conf /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/spec_pre.prf \
@@ -340,9 +346,9 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents Application.h ../PiFileHelper/PiFileHelper.h ../PiFileHelper/pifilehelper_global.h $(DISTDIR)/
-	$(COPY_FILE) --parents main.cpp Application.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents Application.ui $(DISTDIR)/
+	$(COPY_FILE) --parents Application.h ../PiFileHelper/PiFileHelper.h ../PiFileHelper/pifilehelper_global.h selectdialog.h $(DISTDIR)/
+	$(COPY_FILE) --parents main.cpp Application.cpp selectdialog.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents Application.ui selectdialog.ui $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -374,9 +380,9 @@ compiler_moc_predefs_clean:
 moc_predefs.h: /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/data/dummy.cpp
 	g++ -pipe -std=gnu++14 -g -std=gnu++11 -Wall -W -dM -E -o moc_predefs.h /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/data/dummy.cpp
 
-compiler_moc_header_make_all: moc_Application.cpp
+compiler_moc_header_make_all: moc_Application.cpp moc_selectdialog.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_Application.cpp
+	-$(DEL_FILE) moc_Application.cpp moc_selectdialog.cpp
 moc_Application.cpp: ../PiFileHelper/PiFileHelper.h \
 		../PiFileHelper/pifilehelper_global.h \
 		Application.h \
@@ -384,16 +390,25 @@ moc_Application.cpp: ../PiFileHelper/PiFileHelper.h \
 		/usr/lib/qt5/bin/moc
 	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/pi/PiAGVPro/Source/Libs/Application/moc_predefs.h -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/pi/PiAGVPro/Source/Libs/Application -I/home/pi/PiAGVPro/Source/Libs/PiFileHelper -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/8 -I/usr/include/arm-linux-gnueabihf/c++/8 -I/usr/include/c++/8/backward -I/usr/lib/gcc/arm-linux-gnueabihf/8/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/8/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include Application.h -o moc_Application.cpp
 
+moc_selectdialog.cpp: selectdialog.h \
+		moc_predefs.h \
+		/usr/lib/qt5/bin/moc
+	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/pi/PiAGVPro/Source/Libs/Application/moc_predefs.h -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/pi/PiAGVPro/Source/Libs/Application -I/home/pi/PiAGVPro/Source/Libs/PiFileHelper -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/8 -I/usr/include/arm-linux-gnueabihf/c++/8 -I/usr/include/c++/8/backward -I/usr/lib/gcc/arm-linux-gnueabihf/8/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/8/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include selectdialog.h -o moc_selectdialog.cpp
+
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
 compiler_moc_source_make_all:
 compiler_moc_source_clean:
-compiler_uic_make_all: ui_Application.h
+compiler_uic_make_all: ui_Application.h ui_selectdialog.h
 compiler_uic_clean:
-	-$(DEL_FILE) ui_Application.h
+	-$(DEL_FILE) ui_Application.h ui_selectdialog.h
 ui_Application.h: Application.ui \
 		/usr/lib/qt5/bin/uic
 	/usr/lib/qt5/bin/uic Application.ui -o ui_Application.h
+
+ui_selectdialog.h: selectdialog.ui \
+		/usr/lib/qt5/bin/uic
+	/usr/lib/qt5/bin/uic selectdialog.ui -o ui_selectdialog.h
 
 compiler_yacc_decl_make_all:
 compiler_yacc_decl_clean:
@@ -413,11 +428,19 @@ main.o: main.cpp Application.h \
 Application.o: Application.cpp Application.h \
 		../PiFileHelper/PiFileHelper.h \
 		../PiFileHelper/pifilehelper_global.h \
-		ui_Application.h
+		ui_Application.h \
+		selectdialog.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Application.o Application.cpp
+
+selectdialog.o: selectdialog.cpp selectdialog.h \
+		ui_selectdialog.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o selectdialog.o selectdialog.cpp
 
 moc_Application.o: moc_Application.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_Application.o moc_Application.cpp
+
+moc_selectdialog.o: moc_selectdialog.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_selectdialog.o moc_selectdialog.cpp
 
 ####### Install
 

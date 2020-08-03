@@ -26,15 +26,18 @@ CONFIG += c++11
 
 SOURCES += \
         main.cpp \
-        Application.cpp
+        Application.cpp \
+    selectdialog.cpp
 
 HEADERS += \
         Application.h \
     ../PiFileHelper/PiFileHelper.h \
-    ../PiFileHelper/pifilehelper_global.h
+    ../PiFileHelper/pifilehelper_global.h \
+    selectdialog.h
 
 FORMS += \
-        Application.ui
+        Application.ui \
+    selectdialog.ui
 #Add them
 QMAKE_CXXFLAGS +=-std=gnu++14
 # Default rules for deployment.

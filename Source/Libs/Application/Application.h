@@ -27,11 +27,18 @@ private slots:
 
     void on_BntReadAllini_clicked();
 
+    void on_actionOpen_triggered();
+
+    void on_actionSave_triggered();
+
+    void on_actionClose_triggered();
+
 private:
     Ui::Application *ui;
 private:
     static PiFileHelper _m_PiFileHelper;
     QStandardItemModel *mModel;
+    void setValueAt(int ix,int jx,const QString &value);
 };
 
 #endif // APPLICATION_H
