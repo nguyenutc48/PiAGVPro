@@ -16,11 +16,7 @@ PiRFIDReader::PiRFIDReader(QObject *_parent, QString _port, int _baudrate, int _
 {
 }
 
-PiRFIDReader::~PiRFIDReader()
-{
-    disconnect(serial, SIGNAL(readyRead()), this, SLOT(readData()));
-    serialPortClose();
-}
+
 
 int PiRFIDReader::state()
 {
@@ -30,6 +26,11 @@ int PiRFIDReader::state()
 QString PiRFIDReader::log()
 {
     return m_log;
+}
+
+QString PiRFIDReader::dataCard()
+{
+    return m_dataCard;
 }
 
 void PiRFIDReader::ReaderStart()
@@ -90,6 +91,7 @@ void PiRFIDReader::setDataCard(QString data)
 
 bool PiRFIDReader::serialPortOpen()
 {
+    serial = new QSerialPort();
     serial->setPortName(serialPort);
 
     if (serial->open(QIODevice::ReadWrite))

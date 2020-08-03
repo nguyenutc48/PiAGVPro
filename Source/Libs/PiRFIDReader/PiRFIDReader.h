@@ -1,11 +1,12 @@
 #ifndef PIRFIDREADER_H
 #define PIRFIDREADER_H
 
-#include "pirfidreader_global.h"
-#include <QSerialPort>
-#include <QMutex>
+
 #include <QElapsedTimer>
-#include <QDebug>
+#include <QSerialPort>
+#include <QObject>
+#include "pirfidreader_global.h"
+
 
 
 class PIRFIDREADERSHARED_EXPORT PiRFIDReader : public QObject
@@ -31,8 +32,8 @@ class PIRFIDREADERSHARED_EXPORT PiRFIDReader : public QObject
 
 //******************************CONTRUCTOR*************************************************//
 public:
-    PiRFIDReader(QObject *_parent = nullptr, QString _port = "", int _baudrate = 115200, int _timeout = 3000, int _nextcardtime = 2000);
-    ~PiRFIDReader();
+    PiRFIDReader(QObject *_parent = nullptr, QString _port = "/dev/ttyS0", int _baudrate = 38400, int _timeout = 3000, int _nextcardtime = 2000);
+
 
 //***********************************PUBLIC VAILABLE**************************************//
 public:
@@ -58,7 +59,7 @@ public:
 
 
 //************************************PUBLIC SLOTS*****************************************//
-public slots:
+public:
     //start reader
     void ReaderStart();
     void ReaderStop();
