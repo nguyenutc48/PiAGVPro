@@ -1,7 +1,7 @@
 #ifndef PIRFIDREADER_H
 #define PIRFIDREADER_H
 
-
+#include <QThread>
 #include <QElapsedTimer>
 #include <QSerialPort>
 #include <QObject>
@@ -9,119 +9,88 @@
 
 
 
-class PIRFIDREADERSHARED_EXPORT PiRFIDReader : public QObject
+class PIRFIDREADERSHARED_EXPORT PiRFIDReader : public QThread
 {
     Q_OBJECT
 //*******************************PROPERTIES***********************************************//
-    //State
-    Q_PROPERTY(int state READ state WRITE setState NOTIFY stateChanged)
-    //Logs
-    Q_PROPERTY(QString log READ log WRITE setLog NOTIFY logChanged)
-    //RFID data
-    Q_PROPERTY(QString dataCard READ dataCard WRITE setDataCard NOTIFY dataCardChanged)
+    Q_PROPERTY(int state READ state WRITE setState NOTIFY stateChanged)                 //State
+    Q_PROPERTY(QString log READ log WRITE setLog NOTIFY logChanged)                     //Log
+    Q_PROPERTY(QString dataCard READ dataCard WRITE setDataCard NOTIFY dataCardChanged) //Data
 
 //*******************************LIST STATE************************************************//
     enum{
-        RUNNING,
-        OPENED,
-        CLOSED,
-        TIMEOUT,
-        ERROR
+        RUNNING,        //Running
+        OPENED,         //Port openning
+        CLOSED,         //Port closed
+        TIMEOUT,        //Timeout
+        ERROR           //Error
     }State;
 
 
 //******************************CONTRUCTOR*************************************************//
 public:
-    PiRFIDReader(QObject *_parent = nullptr, QString _port = "/dev/ttyS0", int _baudrate = 38400, int _timeout = 3000, int _nextcardtime = 2000);
-
+    PiRFIDReader(QObject *_parent = nullptr, QString _port = "/dev/ttyUSB0", int _baudrate = 38400, int _timeout = 3000, int _nextcardtime = 2000);
+    ~PiRFIDReader();
 
 //***********************************PUBLIC VAILABLE**************************************//
 public:
-    //Cong ket noi
-    QString     serialPort;
-    //Toc do truyen
-    int         baudRate;
-    //Thoi gian time out
-    int         timeOut;
-    //Thoi gian giua cac the lien tiep
-    int         timeNextCard;
-    //Trang thai dang co the
-    bool        onCard;
+    QString     serialPort;         //Serial port
+    int         baudRate;           //Serial baudrate
+    int         timeOut;            //Timeout
+    int         timeNextCard;       //Time next same card
+    bool        onCard;             //Status over card
 
 //***********************************PUBLIC FUNCTIONS**************************************//
 public:
-    //Lay trang thai hien tai
+    void        run();
     int         state();
-    //Lay log hien tai
     QString     log();
-    //Lay ma the doc duoc hien tai
     QString     dataCard();
 
 
 //************************************PUBLIC SLOTS*****************************************//
-public:
-    //start reader
+public slots:
     void ReaderStart();
     void ReaderStop();
 
 //************************************SIGNALS**********************************************//
 signals:
-    //Khi trang thai thay doi
     void stateChanged(int);
-    //Khi log thay doi
     void logChanged(QString);
-    //Khi the thay doi
     void dataCardChanged(QString);
 
 //***********************************PRIVATE FUNCTIONS*************************************//
 private:
-    //Set trang thai
     void setState(int);
-    //Set log
     void setLog(QString);
-    //Set rfid card
     void setDataCard(QString);
-    //Serial port connect
     bool serialPortOpen();
-    //close
     void serialPortClose();
-    //set state log
     void setStateLog(int,QString);
-
-
+    void serialPortAdd(QString);
+    void serialPortSub(QString);
+    bool serialPortCheck(QString);
 
 //***********************************PRIVATE*************************************//
 private:
-    //Lua ma RFID cu
     QString         m_oldCard;
-    //Bien dung scan the rfid
     bool            m_stopScan;
-    // Serial port pointer
     QSerialPort     *serial;
-    //Time count check delay
     QElapsedTimer   m_timeNextCard;
-    //Check frame flag
     int             m_checkHeader;
-    //Data card temp
     QString         m_dataCardTemp;
+    int             m_state = -1;
+    QString         m_log;
+    QString         m_dataCard;
 
 
 //***********************************STATIC PRIVATE****************************************//
 private:
-    //Khoa trang thai chi cho 1 thread scan the rfid
-    static      int         m_oneScan;
-    //Trang thai cua thread
-    static      int         m_state;
-    //Log hien tai
-    static      QString     m_log;
-    //The hien tai
-    static      QString     m_dataCard;
+    static      QList<QString>  m_serialPorts;  //Store all port using this lib
 
 //***********************************PRIVATE SLOTS****************************************//
 private slots:
-    //read data from serial port
     void readData();
-
 
 };
 

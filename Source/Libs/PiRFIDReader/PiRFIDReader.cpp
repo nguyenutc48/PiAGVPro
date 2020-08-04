@@ -1,14 +1,11 @@
 #include "PiRFIDReader.h"
 
 //******************************STATIC DECLARE****************************//
-int         PiRFIDReader::m_oneScan;
-int         PiRFIDReader::m_state;
-QString     PiRFIDReader::m_log;
-QString     PiRFIDReader::m_dataCard;
+QList<QString>  PiRFIDReader::m_serialPorts;
 
 
 PiRFIDReader::PiRFIDReader(QObject *_parent, QString _port, int _baudrate, int _timeout, int _timenextcard) :
-    QObject(_parent),
+    QThread(_parent),
     serialPort(_port),
     baudRate(_baudrate),
     timeOut(_timeout),
@@ -16,7 +13,43 @@ PiRFIDReader::PiRFIDReader(QObject *_parent, QString _port, int _baudrate, int _
 {
 }
 
+PiRFIDReader::~PiRFIDReader()
+{
+    this->serialPortClose();
+}
 
+void PiRFIDReader::run()
+{
+    if(!serialPortCheck(serialPort))
+    {
+        QElapsedTimer timer;
+        timer.start();
+        int temp = 0;
+
+        //Check connection time out
+        while(timer.elapsed()< timeOut)
+        {
+            if(serialPortOpen())
+            {
+                connect(serial, SIGNAL(readyRead()), this, SLOT(readData()));
+                setStateLog(RUNNING,"Reader is running");
+                serialPortAdd(serialPort);
+                temp = 1;
+                break;
+            }
+            else {
+                serialPortClose();
+            }
+        }
+
+        if(temp == 0)
+            setStateLog(TIMEOUT, serialPort+" open is time out");
+    }
+    else
+    {
+        setLog("Port has opened");
+    }
+}
 
 int PiRFIDReader::state()
 {
@@ -35,39 +68,11 @@ QString PiRFIDReader::dataCard()
 
 void PiRFIDReader::ReaderStart()
 {
-    this->m_stopScan = false;
-    if(m_oneScan != 1)
-    {
-        QElapsedTimer timer;
-        timer.start();
-
-        //Check connection time out
-        while(timer.elapsed()< timeOut)
-        {
-            m_oneScan = 1;
-            if(serialPortOpen())
-            {
-                connect(serial, SIGNAL(readyRead()), this, SLOT(readData()));
-                setStateLog(RUNNING,"Reader is running");
-                break;
-            }
-            else {
-                serialPortClose();
-            }
-        }
-        m_oneScan = 0;
-        setStateLog(TIMEOUT, serialPort+" open is time out");
-    }
-    else
-    {
-        setLog("Device has connected");
-    }
+    this->start();
 }
 
 void PiRFIDReader::ReaderStop()
 {
-    this->m_stopScan = true;
-    disconnect(serial, SIGNAL(readyRead()), this, SLOT(readData()));
     this->serialPortClose();
 }
 
@@ -96,11 +101,11 @@ bool PiRFIDReader::serialPortOpen()
 
     if (serial->open(QIODevice::ReadWrite))
     {
-       if (serial->setBaudRate(baudRate) &&
-        serial->setDataBits(QSerialPort::Data8) &&
-        serial->setParity(QSerialPort::NoParity) &&
-        serial->setFlowControl(QSerialPort::NoFlowControl))
-       {
+        if (serial->setBaudRate(baudRate) &&
+                serial->setDataBits(QSerialPort::Data8) &&
+                serial->setParity(QSerialPort::NoParity) &&
+                serial->setFlowControl(QSerialPort::NoFlowControl))
+        {
             setStateLog(OPENED,serialPort+" is Opened");
             return true;
         }
@@ -117,8 +122,13 @@ bool PiRFIDReader::serialPortOpen()
 
 void PiRFIDReader::serialPortClose()
 {
-    serial->close();
-    setStateLog(CLOSED,serialPort+" is Closed");
+    if(m_state == RUNNING)
+    {
+        disconnect(serial, SIGNAL(readyRead()), this, SLOT(readData()));
+        serial->close();
+        setStateLog(CLOSED,serialPort+" is Closed");
+        serialPortSub(serialPort);
+    }
 }
 
 void PiRFIDReader::setStateLog(int state, QString log)
@@ -127,46 +137,69 @@ void PiRFIDReader::setStateLog(int state, QString log)
     setLog(log);
 }
 
+void PiRFIDReader::serialPortAdd(QString _port)
+{
+    if(!serialPortCheck(_port))
+        m_serialPorts.append(_port);
+}
+
+void PiRFIDReader::serialPortSub(QString _port)
+{
+    if(serialPortCheck(_port))
+        m_serialPorts.removeOne(_port);
+}
+
+bool PiRFIDReader::serialPortCheck(QString _port)
+{
+    bool temp = false;
+    if(m_serialPorts.size() >= 1)
+    {
+        for (int i=0; i<m_serialPorts.size(); i++) {
+            if (m_serialPorts.at(i) == _port)
+                temp = true;
+        }
+    }
+    return temp;
+}
+
 void PiRFIDReader::readData()
 {
-    if(this->m_stopScan == false)
-    {
-        if(m_timeNextCard.elapsed()<timeNextCard)
-            m_timeNextCard.restart();
-        else {
-            m_oldCard = "";
-            m_timeNextCard.restart();
-        }
-        m_timeNextCard.start();
-        QByteArray data = serial->readAll();
-        char check_header = data[0];
-        if(m_checkHeader == 1)
-        {
-            if(check_header != 187)
-            {
-                if(check_header != 170)
-                    m_dataCardTemp += data[0];
-            }
-            else
-            {
-                if(m_dataCardTemp.length() == 4)
-                {
-                    if(m_dataCardTemp != m_oldCard)
-                    {
-                        m_oldCard = m_dataCardTemp;
-                        setDataCard(m_dataCardTemp);
-                    }
-
-                }
-                m_dataCardTemp = "";
-                check_header = 0;
-            }
-
-        }
-        if(check_header == 170)
-        {
-            m_checkHeader = 1;
-        }
-        m_timeNextCard.start();
+    if(m_timeNextCard.elapsed()<timeNextCard)
+        m_timeNextCard.restart();
+    else {
+        m_oldCard = "";
+        m_timeNextCard.restart();
     }
+    m_timeNextCard.start();
+    QByteArray data = serial->readAll();
+    char check_header = data[0];
+    if(m_checkHeader == 1)
+    {
+        if(check_header != 187)
+        {
+            if(check_header != 170)
+                m_dataCardTemp += data[0];
+        }
+        else
+        {
+            if(m_dataCardTemp.length() == 4)
+            {
+                if(m_dataCardTemp != m_oldCard)
+                {
+                    m_oldCard = m_dataCardTemp;
+                    setDataCard(m_dataCardTemp);
+                }
+
+            }
+            m_dataCardTemp = "";
+            check_header = 0;
+        }
+
+    }
+    if(check_header == 170)
+    {
+        m_checkHeader = 1;
+    }
+    m_timeNextCard.start();
+
 }
