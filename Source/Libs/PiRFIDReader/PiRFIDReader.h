@@ -1,7 +1,7 @@
 #ifndef PIRFIDREADER_H
 #define PIRFIDREADER_H
 
-#include <QThread>
+
 #include <QElapsedTimer>
 #include <QSerialPort>
 #include <QObject>
@@ -9,7 +9,7 @@
 
 
 
-class PIRFIDREADERSHARED_EXPORT PiRFIDReader : public QThread
+class PIRFIDREADERSHARED_EXPORT PiRFIDReader : public QObject
 {
     Q_OBJECT
 //*******************************PROPERTIES***********************************************//
@@ -43,7 +43,6 @@ public:
 
 //***********************************PUBLIC FUNCTIONS**************************************//
 public:
-    void        run();
     int         state();
     QString     log();
     QString     dataCard();

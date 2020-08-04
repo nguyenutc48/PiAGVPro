@@ -35,7 +35,7 @@ MOVE          = mv -f
 TAR           = tar -cf
 COMPRESS      = gzip -9f
 DISTNAME      = PiRFIDReader1.0.0
-DISTDIR = /home/pi/PiAGVPro/Source/Libs/PiRFIDReader/.tmp/PiRFIDReader1.0.0
+DISTDIR = /home/pi/Documents/PiAGVPro/Source/Libs/PiRFIDReader/.tmp/PiRFIDReader1.0.0
 LINK          = g++
 LFLAGS        = -shared -Wl,-soname,libPiRFIDReader.so.1
 LIBS          = $(SUBLIBS) -lQt5SerialPort -lQt5Core -lpthread -latomic 
@@ -386,7 +386,7 @@ moc_PiRFIDReader.cpp: pirfidreader_global.h \
 		PiRFIDReader.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
-	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/pi/PiAGVPro/Source/Libs/PiRFIDReader/moc_predefs.h -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/pi/PiAGVPro/Source/Libs/PiRFIDReader -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtSerialPort -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/8 -I/usr/include/arm-linux-gnueabihf/c++/8 -I/usr/include/c++/8/backward -I/usr/lib/gcc/arm-linux-gnueabihf/8/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/8/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include PiRFIDReader.h -o moc_PiRFIDReader.cpp
+	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/pi/Documents/PiAGVPro/Source/Libs/PiRFIDReader/moc_predefs.h -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/pi/Documents/PiAGVPro/Source/Libs/PiRFIDReader -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtSerialPort -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/8 -I/usr/include/arm-linux-gnueabihf/c++/8 -I/usr/include/c++/8/backward -I/usr/lib/gcc/arm-linux-gnueabihf/8/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/8/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include PiRFIDReader.h -o moc_PiRFIDReader.cpp
 
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
