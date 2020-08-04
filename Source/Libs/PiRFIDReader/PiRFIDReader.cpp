@@ -65,6 +65,32 @@ QString PiRFIDReader::dataCard()
     return m_dataCard;
 }
 
+bool PiRFIDReader::dataCardWrite(QString _data)
+{
+    if(m_state == RUNNING)
+    {
+        int length = _data.size();
+        if(length != 4)
+            return false;
+        else
+        {
+            QByteArray temp = _data.toLocal8Bit();
+            QByteArray dataFrame;
+            dataFrame.resize(8);
+            dataFrame[0] = 0xaa;
+            dataFrame[1] = 0xc2;
+            dataFrame[2] = 0x00;
+            dataFrame[3] = temp[0];
+            dataFrame[4] = temp[1];
+            dataFrame[5] = temp[2];
+            dataFrame[6] = temp[3];
+            dataFrame[7] = 0xbb;
+            serial->write(dataFrame);
+        }
+    }
+    return false;
+}
+
 void PiRFIDReader::ReaderStart()
 {
     this->start();

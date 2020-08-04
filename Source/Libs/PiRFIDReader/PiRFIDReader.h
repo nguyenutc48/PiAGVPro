@@ -47,6 +47,7 @@ public:
     int         state();
     QString     log();
     QString     dataCard();
+    bool        dataCardWrite(QString);
 
 
 //************************************PUBLIC SLOTS*****************************************//
