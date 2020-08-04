@@ -10,6 +10,8 @@ MainWindow::MainWindow(QWidget *parent) :
     reader = new PiRFIDReader(this);
 
     connect(reader,SIGNAL(logChanged(QString)),ui->label,SLOT(setText(QString)));
+    connect(reader,SIGNAL(dataCardChanged(QString)),ui->label_2,SLOT(setText(QString)));
+    connect(ui->pushButton,SIGNAL(released()),reader,SLOT(ReaderStart()));
 }
 
 MainWindow::~MainWindow()
@@ -19,7 +21,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pushButton_clicked()
 {
-    reader->ReaderStart();
+    //reader->ReaderStart();
 }
 
 void MainWindow::on_pushButton_2_clicked()

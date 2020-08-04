@@ -26,7 +26,6 @@ void PiRFIDReader::run()
         timer.start();
         int temp = 0;
 
-        //Check connection time out
         while(timer.elapsed()< timeOut)
         {
             if(serialPortOpen())

@@ -29,8 +29,9 @@ class PIRFIDREADERSHARED_EXPORT PiRFIDReader : public QThread
 
 //******************************CONTRUCTOR*************************************************//
 public:
-    PiRFIDReader(QObject *_parent = nullptr, QString _port = "/dev/ttyUSB0", int _baudrate = 38400, int _timeout = 3000, int _nextcardtime = 2000);
+    PiRFIDReader(QObject *_parent = nullptr, QString _port = "/dev/ttyUS0", int _baudrate = 38400, int _timeout = 3000, int _nextcardtime = 2000);
     ~PiRFIDReader();
+
 
 //***********************************PUBLIC VAILABLE**************************************//
 public:
@@ -74,7 +75,6 @@ private:
 //***********************************PRIVATE*************************************//
 private:
     QString         m_oldCard;
-    bool            m_stopScan;
     QSerialPort     *serial;
     QElapsedTimer   m_timeNextCard;
     int             m_checkHeader;
