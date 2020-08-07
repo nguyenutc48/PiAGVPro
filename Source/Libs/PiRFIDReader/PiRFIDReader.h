@@ -1,7 +1,7 @@
 #ifndef PIRFIDREADER_H
 #define PIRFIDREADER_H
 
-#include <QThread>
+
 #include <QElapsedTimer>
 #include <QSerialPort>
 #include <QObject>
@@ -9,7 +9,7 @@
 
 
 
-class PIRFIDREADERSHARED_EXPORT PiRFIDReader : public QThread
+class PIRFIDREADERSHARED_EXPORT PiRFIDReader : public QObject
 {
     Q_OBJECT
 //*******************************PROPERTIES***********************************************//
@@ -29,7 +29,7 @@ class PIRFIDREADERSHARED_EXPORT PiRFIDReader : public QThread
 
 //******************************CONTRUCTOR*************************************************//
 public:
-    PiRFIDReader(QObject *_parent = nullptr, QString _port = "/dev/ttyUS0", int _baudrate = 38400, int _timeout = 3000, int _nextcardtime = 2000);
+    PiRFIDReader(QObject *_parent = nullptr, QString _port = "/dev/ttyS0", int _baudrate = 38400, int _timeout = 3000, int _nextcardtime = 2000);
     ~PiRFIDReader();
 
 
@@ -39,11 +39,9 @@ public:
     int         baudRate;           //Serial baudrate
     int         timeOut;            //Timeout
     int         timeNextCard;       //Time next same card
-    bool        onCard;             //Status over card
 
 //***********************************PUBLIC FUNCTIONS**************************************//
 public:
-    void        run();
     int         state();
     QString     log();
     QString     dataCard();

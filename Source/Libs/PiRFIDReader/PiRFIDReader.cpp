@@ -5,7 +5,7 @@ QList<QString>  PiRFIDReader::m_serialPorts;
 
 
 PiRFIDReader::PiRFIDReader(QObject *_parent, QString _port, int _baudrate, int _timeout, int _timenextcard) :
-    QThread(_parent),
+    QObject(_parent),
     serialPort(_port),
     baudRate(_baudrate),
     timeOut(_timeout),
@@ -18,37 +18,7 @@ PiRFIDReader::~PiRFIDReader()
     this->serialPortClose();
 }
 
-void PiRFIDReader::run()
-{
-    if(!serialPortCheck(serialPort))
-    {
-        QElapsedTimer timer;
-        timer.start();
-        int temp = 0;
 
-        while(timer.elapsed()< timeOut)
-        {
-            if(serialPortOpen())
-            {
-                connect(serial, SIGNAL(readyRead()), this, SLOT(readData()));
-                setStateLog(RUNNING,"Reader is running");
-                serialPortAdd(serialPort);
-                temp = 1;
-                break;
-            }
-            else {
-                serialPortClose();
-            }
-        }
-
-        if(temp == 0)
-            setStateLog(TIMEOUT, serialPort+" open is time out");
-    }
-    else
-    {
-        setLog("Port has opened");
-    }
-}
 
 int PiRFIDReader::state()
 {
@@ -93,7 +63,34 @@ bool PiRFIDReader::dataCardWrite(QString _data)
 
 void PiRFIDReader::ReaderStart()
 {
-    this->start();
+    if(!serialPortCheck(serialPort))
+    {
+        QElapsedTimer timer;
+        timer.start();
+        int temp = 0;
+
+        while(timer.elapsed()< timeOut)
+        {
+            if(serialPortOpen())
+            {
+                connect(serial, SIGNAL(readyRead()), this, SLOT(readData()));
+                setStateLog(RUNNING,"Reader is running");
+                serialPortAdd(serialPort);
+                temp = 1;
+                break;
+            }
+            else {
+                serialPortClose();
+            }
+        }
+
+        if(temp == 0)
+            setStateLog(TIMEOUT, serialPort+" open is time out");
+    }
+    else
+    {
+        setLog("Port has opened");
+    }
 }
 
 void PiRFIDReader::ReaderStop()

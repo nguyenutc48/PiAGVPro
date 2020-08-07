@@ -1,5 +1,7 @@
 #include "PiGuideReader.h"
 
+//******************************STATIC DECLARE****************************//
+QList<QString>  PiGuideReader::m_serialPorts;
 
 PiGuideReader::PiGuideReader(QObject *_parent, QString _port, int _baudrate, int _timeout):
     QObject (_parent),
@@ -7,7 +9,11 @@ PiGuideReader::PiGuideReader(QObject *_parent, QString _port, int _baudrate, int
     baudRate(_baudrate),
     timeOut(_timeout)
 {
-    m_stopScan = false;
+}
+
+PiGuideReader::~PiGuideReader()
+{
+    this->serialPortClose();
 }
 
 int PiGuideReader::state()
@@ -27,43 +33,38 @@ int PiGuideReader::dataGuide()
 
 void PiGuideReader::ReaderStart()
 {
-    this->m_stopScan = false;
-    if(m_oneScan != 1)
+    if(!serialPortCheck(serialPort))
     {
         QElapsedTimer timer;
         timer.start();
+        int temp = 0;
 
-        //Check connection time out
         while(timer.elapsed()< timeOut)
         {
-            m_oneScan = 1;
             if(serialPortOpen())
             {
                 connect(serial, SIGNAL(readyRead()), this, SLOT(readData()));
                 setStateLog(RUNNING,"Reader is running");
-                while(!m_stopScan)
-                {
-                    serial->clear();
-                    serial->write("\002A1\003");
-                }
+                serialPortAdd(serialPort);
+                temp = 1;
+                break;
             }
             else {
                 serialPortClose();
             }
         }
-        m_oneScan = 0;
-        setStateLog(TIMEOUT,serialPort+" open is time out");
+
+        if(temp == 0)
+            setStateLog(TIMEOUT, serialPort+" open is time out");
     }
     else
     {
-        setLog("Device has connected");
+        setLog("Port has opened");
     }
 }
 
 void PiGuideReader::ReaderStop()
 {
-    this->m_stopScan = true;
-    disconnect(serial, SIGNAL(readyRead()), this, SLOT(readData()));
     this->serialPortClose();
 }
 
@@ -91,11 +92,11 @@ bool PiGuideReader::serialPortOpen()
 
     if (serial->open(QIODevice::ReadWrite))
     {
-       if (serial->setBaudRate(baudRate) &&
-        serial->setDataBits(QSerialPort::Data8) &&
-        serial->setParity(QSerialPort::NoParity) &&
-        serial->setFlowControl(QSerialPort::NoFlowControl))
-       {
+        if (serial->setBaudRate(baudRate) &&
+                serial->setDataBits(QSerialPort::Data8) &&
+                serial->setParity(QSerialPort::NoParity) &&
+                serial->setFlowControl(QSerialPort::NoFlowControl))
+        {
             setStateLog(OPENED,serialPort+" is Opened");
             return true;
         }
@@ -112,8 +113,13 @@ bool PiGuideReader::serialPortOpen()
 
 void PiGuideReader::serialPortClose()
 {
-    serial->close();
-    setStateLog(CLOSED,serialPort+" is Closed");
+    if(m_state == RUNNING)
+    {
+        disconnect(serial, SIGNAL(readyRead()), this, SLOT(readData()));
+        serial->close();
+        setStateLog(CLOSED,serialPort+" is Closed");
+        serialPortSub(serialPort);
+    }
 }
 
 void PiGuideReader::setStateLog(int state, QString log)
@@ -122,7 +128,52 @@ void PiGuideReader::setStateLog(int state, QString log)
     setLog(log);
 }
 
+void PiGuideReader::serialPortAdd(QString _port)
+{
+    if(!serialPortCheck(_port))
+        m_serialPorts.append(_port);
+}
+
+void PiGuideReader::serialPortSub(QString _port)
+{
+    if(serialPortCheck(_port))
+        m_serialPorts.removeOne(_port);
+}
+
+bool PiGuideReader::serialPortCheck(QString _port)
+{
+    bool temp = false;
+    if(m_serialPorts.size() >= 1)
+    {
+        for (int i=0; i<m_serialPorts.size(); i++) {
+            if (m_serialPorts.at(i) == _port)
+                temp = true;
+        }
+    }
+    return temp;
+}
+
 void PiGuideReader::readData()
 {
+    QByteArray data = serial->readAll();
+    char check_header = data[0];
+    if(m_checkHeader == 1)
+    {
+        m_dataScan += data;
 
+        if(m_dataScan.size() >= 3)
+        {
+            if(m_dataScan[0] == '+' || m_dataScan[0] == '-')
+            {
+                m_dataGuideTemp = m_dataScan.mid(0,2);
+            }
+            m_dataScan.clear();
+            serial->clear();
+            serial->write("\002A1\003");
+        }
+    }
+    if(check_header == 'a')
+    {
+        m_checkHeader = 1;
+    }
 }

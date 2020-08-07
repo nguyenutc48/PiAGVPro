@@ -8,15 +8,13 @@
 #include <QElapsedTimer>
 #include <QObject>
 
+
 class PIGUIDEREADERSHARED_EXPORT PiGuideReader : public QObject
 {
     Q_OBJECT
 //*******************************PROPERTIES***********************************************//
-    //State
     Q_PROPERTY(int state READ state WRITE setState NOTIFY stateChanged)
-    //Logs
     Q_PROPERTY(QString log READ log WRITE setLog NOTIFY logChanged)
-    //Guide data
     Q_PROPERTY(int dataGuide READ dataGuide WRITE setDataGuide NOTIFY dataGuideChanged)
 
 //*******************************LIST STATE************************************************//
@@ -39,7 +37,6 @@ public:
     int         baudRate;           //Toc do truyen
     int         timeOut;            //Thoi gian time out
     int         timeOutGuide;       //Thoi gian out guide cho phep
-    bool        onGuide;            //Trang thai dang co the
 
 //***********************************PUBLIC FUNCTIONS**************************************//
 public:
@@ -67,18 +64,25 @@ private:
     bool serialPortOpen();          //Serial port connect
     void serialPortClose();         //close
     void setStateLog(int,QString);  //set state log
+    void serialPortAdd(QString);
+    void serialPortSub(QString);
+    bool serialPortCheck(QString);
 
 //***********************************PRIVATE FUNCTIONS*************************************//
 private:
     bool            m_stopScan;     //Bien dung scan the rfid
     QSerialPort     *serial;        // Serial port pointer
+    int             m_state;        //Trang thai cua thread
+    QString         m_log;          //Log hien tai
+    int             m_dataGuide;    //The hien tai
+    int             m_checkHeader;
+    QString         m_dataGuideTemp;
+    QByteArray      m_dataScan;
+    int             m_dataCount;
 
 //***********************************STATIC PRIVATE****************************************//
 private:
-    static      int         m_oneScan;      //Khoa trang thai chi cho 1 thread scan the rfid
-    static      int         m_state;        //Trang thai cua thread
-    static      QString     m_log;          //Log hien tai
-    static      int         m_dataGuide;    //The hien tai
+    static      QList<QString>  m_serialPorts;  //Store all port using this lib
 
 private slots:
     void readData();

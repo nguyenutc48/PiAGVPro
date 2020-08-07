@@ -43,6 +43,8 @@ AR            = ar cqs
 RANLIB        = 
 SED           = sed
 STRIP         = strip
+OUTPUTFILE  = PiGuideReader.h
+INCLUDEDIR  = /usr/include
 
 ####### Output directory
 
@@ -432,6 +434,11 @@ install_target: first FORCE
 	-$(SYMLINK) $(TARGET) $(INSTALL_ROOT)/usr/lib/$(TARGET0)
 	-$(SYMLINK) $(TARGET) $(INSTALL_ROOT)/usr/lib/$(TARGET1)
 	-$(SYMLINK) $(TARGET) $(INSTALL_ROOT)/usr/lib/$(TARGET2)
+	cp PiGuideReader.h /usr/include/PiGuideReader.h
+	cp piguidereader_global.h /usr/include/piguidereader_global.h
+	
+
+	
 
 uninstall_target: FORCE
 	-$(DEL_FILE) $(INSTALL_ROOT)/usr/lib/$(TARGET) 
