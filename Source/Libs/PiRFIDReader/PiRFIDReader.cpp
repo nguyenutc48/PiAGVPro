@@ -155,6 +155,7 @@ void PiRFIDReader::serialPortClose()
 {
     if(m_state == RUNNING)
     {
+        p_timer->stop();
         disconnect(p_serial, SIGNAL(readyRead()), this, SLOT(readData()));
         p_serial->close();
         setStateLog(CLOSED,serialPort+" is Closed");
