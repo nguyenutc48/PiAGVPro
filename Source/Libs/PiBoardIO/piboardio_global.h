@@ -1,0 +1,12 @@
+#ifndef PIBOARDIO_GLOBAL_H
+#define PIBOARDIO_GLOBAL_H
+
+#include <QtCore/qglobal.h>
+
+#if defined(PIBOARDIO_LIBRARY)
+#  define PIBOARDIOSHARED_EXPORT Q_DECL_EXPORT
+#else
+#  define PIBOARDIOSHARED_EXPORT Q_DECL_IMPORT
+#endif
+
+#endif // PIBOARDIO_GLOBAL_H

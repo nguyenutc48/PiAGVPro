@@ -5,12 +5,12 @@
 #include <QElapsedTimer>
 #include <QSerialPort>
 #include <QObject>
-#include "pirfidreader_global.h"
+//#include "pirfidreader_global.h"
 #include <QTimer>
 
 
 
-class PIRFIDREADERSHARED_EXPORT PiRFIDReader : public QObject
+class PiRFIDReader : public QObject
 {
     Q_OBJECT
 //*******************************PROPERTIES***********************************************//

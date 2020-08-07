@@ -1,16 +1,15 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2020-07-23T13:16:48
+# Project created by QtCreator 2020-08-07T17:05:59
 #
 #-------------------------------------------------
 
 QT       -= gui
-QT       += serialport
 
-TARGET = PiGuideReader
+TARGET = PiBoardIO
 TEMPLATE = lib
 
-DEFINES += PIGUIDEREADER_LIBRARY
+DEFINES += PIBOARDIO_LIBRARY
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings
@@ -24,11 +23,11 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-        PiGuideReader.cpp
+        PiBoardIO.cpp
 
 HEADERS += \
-        PiGuideReader.h #\
-        #piguidereader_global.h
+        PiBoardIO.h #\
+        #piboardio_global.h
 
 unix {
     target.path = /usr/lib

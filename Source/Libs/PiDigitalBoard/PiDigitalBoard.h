@@ -3,6 +3,8 @@
 
 #include "pidigitalboard_global.h"
 #include <QThread>
+#include <QTimer>
+#include <QElapsedTimer>
 
 #define ON  true
 #define OFF false
@@ -11,20 +13,14 @@
 class PIDIGITALBOARDSHARED_EXPORT PiDigitalBoard : public QThread
 {
     Q_OBJECT
-    //Input
+//*********************************PROPERTIES**********************************************************//
     Q_PROPERTY(QList<bool> input READ input WRITE setInput NOTIFY inputChanged)
-    //Output
     Q_PROPERTY(QList<bool> output READ output WRITE setOutput NOTIFY outputChanged)
-    //
-    Q_PROPERTY(QString configPath READ configPath WRITE setConfigPath NOTIFY configPathChanged)
 
-
-    //Format common
-    //Update state
     Q_PROPERTY(int state READ state WRITE setState NOTIFY stateChanged)
-    //Log
     Q_PROPERTY(QString log READ log WRITE setLog NOTIFY logChanged)
 
+//***********************************STATE*************************************************************//
     enum{
         INIT_DONE = 0, //Trang thai da init board xong
         ERROR_DIR
@@ -33,6 +29,7 @@ class PIDIGITALBOARDSHARED_EXPORT PiDigitalBoard : public QThread
 
 public:
     PiDigitalBoard(QObject *parent = nullptr, QString path = "/home/pi/boardconfig.ini");
+    ~PiDigitalBoard();
 
     QList<bool> input();
 

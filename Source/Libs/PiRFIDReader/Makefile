@@ -138,8 +138,7 @@ DIST          = /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/exceptions.prf \
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/yacc.prf \
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/lex.prf \
-		PiRFIDReader.pro PiRFIDReader.h \
-		pirfidreader_global.h PiRFIDReader.cpp
+		PiRFIDReader.pro PiRFIDReader.h PiRFIDReader.cpp
 QMAKE_TARGET  = PiRFIDReader
 DESTDIR       = 
 TARGET        = libPiRFIDReader.so.1.0.0
@@ -360,7 +359,7 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents PiRFIDReader.h pirfidreader_global.h $(DISTDIR)/
+	$(COPY_FILE) --parents PiRFIDReader.h $(DISTDIR)/
 	$(COPY_FILE) --parents PiRFIDReader.cpp $(DISTDIR)/
 
 
@@ -397,8 +396,7 @@ moc_predefs.h: /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/data/dummy.cpp
 compiler_moc_header_make_all: moc_PiRFIDReader.cpp
 compiler_moc_header_clean:
 	-$(DEL_FILE) moc_PiRFIDReader.cpp
-moc_PiRFIDReader.cpp: pirfidreader_global.h \
-		PiRFIDReader.h \
+moc_PiRFIDReader.cpp: PiRFIDReader.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
 	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/pi/PiAGVPro/Source/Libs/PiRFIDReader/moc_predefs.h -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/pi/PiAGVPro/Source/Libs/PiRFIDReader -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtSerialPort -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/8 -I/usr/include/arm-linux-gnueabihf/c++/8 -I/usr/include/c++/8/backward -I/usr/lib/gcc/arm-linux-gnueabihf/8/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/8/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include PiRFIDReader.h -o moc_PiRFIDReader.cpp
@@ -417,8 +415,7 @@ compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean
 
 ####### Compile
 
-PiRFIDReader.o: PiRFIDReader.cpp PiRFIDReader.h \
-		pirfidreader_global.h
+PiRFIDReader.o: PiRFIDReader.cpp PiRFIDReader.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o PiRFIDReader.o PiRFIDReader.cpp
 
 moc_PiRFIDReader.o: moc_PiRFIDReader.cpp 
@@ -432,8 +429,6 @@ install_target: first FORCE
 	-$(SYMLINK) $(TARGET) $(INSTALL_ROOT)/usr/lib/$(TARGET0)
 	-$(SYMLINK) $(TARGET) $(INSTALL_ROOT)/usr/lib/$(TARGET1)
 	-$(SYMLINK) $(TARGET) $(INSTALL_ROOT)/usr/lib/$(TARGET2)
-	cp PiRFIDReader.h /usr/include/PiRFIDReader.h
-	cp pirfidreader_global.h /usr/include/pirfidreader_global.h
 
 uninstall_target: FORCE
 	-$(DEL_FILE) $(INSTALL_ROOT)/usr/lib/$(TARGET) 

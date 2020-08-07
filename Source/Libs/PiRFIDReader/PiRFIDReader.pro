@@ -26,8 +26,8 @@ SOURCES += \
         PiRFIDReader.cpp
 
 HEADERS += \
-        PiRFIDReader.h \
-        pirfidreader_global.h 
+        PiRFIDReader.h #\
+        #pirfidreader_global.h
 
 unix {
     target.path = /usr/lib

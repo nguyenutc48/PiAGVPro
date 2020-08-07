@@ -1,7 +1,7 @@
 #ifndef PIGUIDEREADER_H
 #define PIGUIDEREADER_H
 
-#include "piguidereader_global.h"
+//#include "piguidereader_global.h"
 #include <QThread>
 #include <QSerialPort>
 #include <QMutex>
@@ -10,7 +10,7 @@
 #include <QTimer>
 
 
-class PIGUIDEREADERSHARED_EXPORT PiGuideReader : public QObject
+class PiGuideReader : public QObject
 {
     Q_OBJECT
 //*******************************PROPERTIES***********************************************//
