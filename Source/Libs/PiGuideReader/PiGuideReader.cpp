@@ -185,8 +185,10 @@ void PiGuideReader::timer_update()
 {
     if(m_timeCheckConnected.elapsed()>timeReconnect)
     {
-        this->serialPortClose();
+        setDataGuide("+18");
         setLog(serialPort+" Can not read data from guide sensor, please check connection cable");
         m_timeCheckConnected.restart();
+        p_serial->clear();
+        p_serial->write("\002A1\003");
     }
 }
