@@ -7,6 +7,7 @@
 #include <QMutex>
 #include <QElapsedTimer>
 #include <QObject>
+#include <QTimer>
 
 
 class PIGUIDEREADERSHARED_EXPORT PiGuideReader : public QObject
@@ -15,7 +16,7 @@ class PIGUIDEREADERSHARED_EXPORT PiGuideReader : public QObject
 //*******************************PROPERTIES***********************************************//
     Q_PROPERTY(int state READ state WRITE setState NOTIFY stateChanged)
     Q_PROPERTY(QString log READ log WRITE setLog NOTIFY logChanged)
-    Q_PROPERTY(int dataGuide READ dataGuide WRITE setDataGuide NOTIFY dataGuideChanged)
+    Q_PROPERTY(QString dataGuide READ dataGuide WRITE setDataGuide NOTIFY dataGuideChanged)
 
 //*******************************LIST STATE************************************************//
     enum{
@@ -28,7 +29,7 @@ class PIGUIDEREADERSHARED_EXPORT PiGuideReader : public QObject
 
 public:
 //******************************CONTRUCTOR*************************************************//
-    PiGuideReader(QObject *_parent = nullptr, QString _port = "", int _baudrate = 115200, int _timeout= 3000);
+    PiGuideReader(QObject *_parent = nullptr, QString _port = "/dev/ttyAMA4", int _baudrate = 115200, int _timeout= 3000, int _timereconnect = 5000);
     ~PiGuideReader();
 
 //***********************************PUBLIC VAILABLE**************************************//
@@ -37,12 +38,13 @@ public:
     int         baudRate;           //Toc do truyen
     int         timeOut;            //Thoi gian time out
     int         timeOutGuide;       //Thoi gian out guide cho phep
+    int         timeReconnect;      //Thoi gian cho kiem tra guide co nhan duoc data khong
 
 //***********************************PUBLIC FUNCTIONS**************************************//
 public:
     int         state();            //Lay trang thai hien tai
     QString     log();              //Lay log hien tai
-    int     dataGuide();            //Lay ma the doc duoc hien tai
+    QString     dataGuide();            //Lay ma the doc duoc hien tai
 
 //************************************PUBLIC SLOTS*****************************************//
 public slots:
@@ -54,13 +56,13 @@ public slots:
 signals:
     void stateChanged(int);         //Khi trang thai thay doi
     void logChanged(QString);       //Khi log thay doi
-    void dataGuideChanged(int);     //Khi the thay doi
+    void dataGuideChanged(QString);     //Khi the thay doi
 
 //***********************************PRIVATE FUNCTIONS*************************************//
 private:
     void setState(int);             //Set trang thai
     void setLog(QString);           //Set log
-    void setDataGuide(int);         //Set guide index
+    void setDataGuide(QString);         //Set guide index
     bool serialPortOpen();          //Serial port connect
     void serialPortClose();         //close
     void setStateLog(int,QString);  //set state log
@@ -71,14 +73,14 @@ private:
 //***********************************PRIVATE FUNCTIONS*************************************//
 private:
     bool            m_stopScan;     //Bien dung scan the rfid
-    QSerialPort     *serial;        // Serial port pointer
+    QSerialPort     *p_serial;        //Serial port pointer
     int             m_state;        //Trang thai cua thread
     QString         m_log;          //Log hien tai
-    int             m_dataGuide;    //The hien tai
-    int             m_checkHeader;
-    QString         m_dataGuideTemp;
-    QByteArray      m_dataScan;
-    int             m_dataCount;
+    QString         m_dataGuide;    //The hien tai
+    QString         m_dataGuideTemp;//data tam
+    QElapsedTimer   m_timeCheckConnected;   //time counter when disconnected
+    QTimer          *p_timer;
+    bool            m_oneCon;   //Connecting one time
 
 //***********************************STATIC PRIVATE****************************************//
 private:
@@ -86,6 +88,7 @@ private:
 
 private slots:
     void readData();
+    void timer_update();
 
 };
 

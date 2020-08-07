@@ -3,12 +3,17 @@
 //******************************STATIC DECLARE****************************//
 QList<QString>  PiGuideReader::m_serialPorts;
 
-PiGuideReader::PiGuideReader(QObject *_parent, QString _port, int _baudrate, int _timeout):
+PiGuideReader::PiGuideReader(QObject *_parent, QString _port, int _baudrate, int _timeout, int _timereconnect):
     QObject (_parent),
     serialPort(_port),
     baudRate(_baudrate),
-    timeOut(_timeout)
+    timeOut(_timeout),
+    timeReconnect(_timereconnect)
 {
+    m_oneCon = false;
+    p_timer = new QTimer(this);
+    connect(p_timer, SIGNAL(timeout()), this, SLOT(timer_update()));
+
 }
 
 PiGuideReader::~PiGuideReader()
@@ -26,40 +31,46 @@ QString PiGuideReader::log()
     return m_log;
 }
 
-int PiGuideReader::dataGuide()
+QString PiGuideReader::dataGuide()
 {
     return m_dataGuide;
 }
 
 void PiGuideReader::ReaderStart()
 {
-    if(!serialPortCheck(serialPort))
-    {
-        QElapsedTimer timer;
-        timer.start();
-        int temp = 0;
-
-        while(timer.elapsed()< timeOut)
+    if(!m_oneCon){
+        if(!serialPortCheck(serialPort))
         {
-            if(serialPortOpen())
+            m_oneCon = true;
+            QElapsedTimer timer;
+            int temp = 0;
+            timer.start();
+            while(timer.elapsed()< timeOut)
             {
-                connect(serial, SIGNAL(readyRead()), this, SLOT(readData()));
-                setStateLog(RUNNING,"Reader is running");
-                serialPortAdd(serialPort);
-                temp = 1;
-                break;
+                if(serialPortOpen())
+                {
+                    connect(p_serial, SIGNAL(readyRead()), this, SLOT(readData()));
+                    setStateLog(RUNNING,"Reader is running");
+                    serialPortAdd(serialPort);
+                    p_serial->clear();
+                    p_serial->write("\002A1\003");  //send first data request
+                    p_timer->start(1000);
+                    m_timeCheckConnected.start();
+                    temp = 1;
+                    break;
+                }
+                else {
+                    serialPortClose();
+                }
             }
-            else {
-                serialPortClose();
-            }
+            if(temp == 0)
+                setStateLog(TIMEOUT, serialPort+" open is time out");
+            m_oneCon = false;
         }
-
-        if(temp == 0)
-            setStateLog(TIMEOUT, serialPort+" open is time out");
-    }
-    else
-    {
-        setLog("Port has opened");
+        else
+        {
+            setLog("Port has opened");
+        }
     }
 }
 
@@ -80,7 +91,7 @@ void PiGuideReader::setLog(QString data)
     emit logChanged(m_log);
 }
 
-void PiGuideReader::setDataGuide(int data)
+void PiGuideReader::setDataGuide(QString data)
 {
     m_dataGuide = data;
     emit dataGuideChanged(m_dataGuide);
@@ -88,14 +99,15 @@ void PiGuideReader::setDataGuide(int data)
 
 bool PiGuideReader::serialPortOpen()
 {
-    serial->setPortName(serialPort);
-
-    if (serial->open(QIODevice::ReadWrite))
+    p_serial = new QSerialPort();
+    p_serial->setPortName(serialPort);
+    setLog("Start opening to port "+serialPort);
+    if (p_serial->open(QIODevice::ReadWrite))
     {
-        if (serial->setBaudRate(baudRate) &&
-                serial->setDataBits(QSerialPort::Data8) &&
-                serial->setParity(QSerialPort::NoParity) &&
-                serial->setFlowControl(QSerialPort::NoFlowControl))
+        if (p_serial->setBaudRate(baudRate) &&
+                p_serial->setDataBits(QSerialPort::Data8) &&
+                p_serial->setParity(QSerialPort::NoParity) &&
+                p_serial->setFlowControl(QSerialPort::NoFlowControl))
         {
             setStateLog(OPENED,serialPort+" is Opened");
             return true;
@@ -115,8 +127,8 @@ void PiGuideReader::serialPortClose()
 {
     if(m_state == RUNNING)
     {
-        disconnect(serial, SIGNAL(readyRead()), this, SLOT(readData()));
-        serial->close();
+        disconnect(p_serial, SIGNAL(readyRead()), this, SLOT(readData()));
+        p_serial->close();
         setStateLog(CLOSED,serialPort+" is Closed");
         serialPortSub(serialPort);
     }
@@ -155,25 +167,25 @@ bool PiGuideReader::serialPortCheck(QString _port)
 
 void PiGuideReader::readData()
 {
-    QByteArray data = serial->readAll();
-    char check_header = data[0];
-    if(m_checkHeader == 1)
+    m_timeCheckConnected.restart();
+    QByteArray data = p_serial->readAll();
+    int index_header = data.indexOf('a');
+    if(index_header != -1)
     {
-        m_dataScan += data;
-
-        if(m_dataScan.size() >= 3)
-        {
-            if(m_dataScan[0] == '+' || m_dataScan[0] == '-')
-            {
-                m_dataGuideTemp = m_dataScan.mid(0,2);
-            }
-            m_dataScan.clear();
-            serial->clear();
-            serial->write("\002A1\003");
-        }
+        m_dataGuideTemp = data.mid(index_header+1,3);
+        setDataGuide(m_dataGuideTemp);
     }
-    if(check_header == 'a')
+    p_serial->clear();
+    p_serial->write("\002A1\003");
+    m_timeCheckConnected.start();
+}
+
+void PiGuideReader::timer_update()
+{
+    if(m_timeCheckConnected.elapsed()>timeReconnect)
     {
-        m_checkHeader = 1;
+        this->serialPortClose();
+        setLog(serialPort+" Can not read data from guide sensor, please check connection cable");
+        m_timeCheckConnected.restart();
     }
 }

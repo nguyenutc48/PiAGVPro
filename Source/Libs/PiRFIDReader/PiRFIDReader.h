@@ -6,6 +6,7 @@
 #include <QSerialPort>
 #include <QObject>
 #include "pirfidreader_global.h"
+#include <QTimer>
 
 
 
@@ -46,6 +47,7 @@ public:
     QString     log();
     QString     dataCard();
     bool        dataCardWrite(QString);
+    bool        onCard;
 
 
 //************************************PUBLIC SLOTS*****************************************//
@@ -74,13 +76,16 @@ private:
 //***********************************PRIVATE*************************************//
 private:
     QString         m_oldCard;
-    QSerialPort     *serial;
+    QSerialPort     *p_serial;
     QElapsedTimer   m_timeNextCard;
     int             m_checkHeader;
     QString         m_dataCardTemp;
     int             m_state = -1;
     QString         m_log;
     QString         m_dataCard;
+    QElapsedTimer   m_timeCheckConnected;   //time counter when disconnected
+    QTimer          *p_timer;
+    bool            m_oneCon;   //Connecting one time
 
 
 //***********************************STATIC PRIVATE****************************************//
@@ -90,6 +95,7 @@ private:
 //***********************************PRIVATE SLOTS****************************************//
 private slots:
     void readData();
+    void timer_update();
 
 };
 

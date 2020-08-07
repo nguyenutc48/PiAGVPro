@@ -11,6 +11,10 @@ PiRFIDReader::PiRFIDReader(QObject *_parent, QString _port, int _baudrate, int _
     timeOut(_timeout),
     timeNextCard(_timenextcard)
 {
+    m_oneCon = false;
+    onCard = false;
+    p_timer = new QTimer(this);
+    connect(p_timer, SIGNAL(timeout()), this, SLOT(timer_update()));
 }
 
 PiRFIDReader::~PiRFIDReader()
@@ -55,7 +59,8 @@ bool PiRFIDReader::dataCardWrite(QString _data)
             dataFrame[5] = temp[2];
             dataFrame[6] = temp[3];
             dataFrame[7] = 0xbb;
-            serial->write(dataFrame);
+            p_serial->write(dataFrame);
+            setLog("Write data to card DONE");
         }
     }
     return false;
@@ -63,33 +68,37 @@ bool PiRFIDReader::dataCardWrite(QString _data)
 
 void PiRFIDReader::ReaderStart()
 {
-    if(!serialPortCheck(serialPort))
-    {
-        QElapsedTimer timer;
-        timer.start();
-        int temp = 0;
-
-        while(timer.elapsed()< timeOut)
+    if(!m_oneCon){
+        if(!serialPortCheck(serialPort))
         {
-            if(serialPortOpen())
+            m_oneCon = true;
+            QElapsedTimer timer;
+            int temp = 0;
+            timer.start();
+            while(timer.elapsed()<timeOut)
             {
-                connect(serial, SIGNAL(readyRead()), this, SLOT(readData()));
-                setStateLog(RUNNING,"Reader is running");
-                serialPortAdd(serialPort);
-                temp = 1;
-                break;
+                if(serialPortOpen())
+                {
+                    m_timeCheckConnected.start();
+                    connect(p_serial, SIGNAL(readyRead()), this, SLOT(readData()));
+                    setStateLog(RUNNING,"Reader is running");
+                    serialPortAdd(serialPort);
+                    p_timer->start(100);
+                    temp = 1;
+                    break;
+                }
+                else {
+                    serialPortClose();
+                }
             }
-            else {
-                serialPortClose();
-            }
+            if(temp == 0)
+                setStateLog(TIMEOUT, serialPort+" open is time out");
+            m_oneCon = false;
         }
-
-        if(temp == 0)
-            setStateLog(TIMEOUT, serialPort+" open is time out");
-    }
-    else
-    {
-        setLog("Port has opened");
+        else
+        {
+            setLog(serialPort +" this port has opened");
+        }
     }
 }
 
@@ -118,15 +127,15 @@ void PiRFIDReader::setDataCard(QString data)
 
 bool PiRFIDReader::serialPortOpen()
 {
-    serial = new QSerialPort();
-    serial->setPortName(serialPort);
-
-    if (serial->open(QIODevice::ReadWrite))
+    p_serial = new QSerialPort(this);
+    p_serial->setPortName(serialPort);
+    setLog("Start opening to port "+serialPort);
+    if (p_serial->open(QIODevice::ReadWrite))
     {
-        if (serial->setBaudRate(baudRate) &&
-                serial->setDataBits(QSerialPort::Data8) &&
-                serial->setParity(QSerialPort::NoParity) &&
-                serial->setFlowControl(QSerialPort::NoFlowControl))
+        if (p_serial->setBaudRate(baudRate) &&
+                p_serial->setDataBits(QSerialPort::Data8) &&
+                p_serial->setParity(QSerialPort::NoParity) &&
+                p_serial->setFlowControl(QSerialPort::NoFlowControl))
         {
             setStateLog(OPENED,serialPort+" is Opened");
             return true;
@@ -146,8 +155,8 @@ void PiRFIDReader::serialPortClose()
 {
     if(m_state == RUNNING)
     {
-        disconnect(serial, SIGNAL(readyRead()), this, SLOT(readData()));
-        serial->close();
+        disconnect(p_serial, SIGNAL(readyRead()), this, SLOT(readData()));
+        p_serial->close();
         setStateLog(CLOSED,serialPort+" is Closed");
         serialPortSub(serialPort);
     }
@@ -186,6 +195,8 @@ bool PiRFIDReader::serialPortCheck(QString _port)
 
 void PiRFIDReader::readData()
 {
+    onCard = true;
+    m_timeCheckConnected.restart();
     if(m_timeNextCard.elapsed()<timeNextCard)
         m_timeNextCard.restart();
     else {
@@ -193,7 +204,7 @@ void PiRFIDReader::readData()
         m_timeNextCard.restart();
     }
     m_timeNextCard.start();
-    QByteArray data = serial->readAll();
+    QByteArray data = p_serial->readAll();
     char check_header = data[0];
     if(m_checkHeader == 1)
     {
@@ -223,5 +234,13 @@ void PiRFIDReader::readData()
         m_checkHeader = 1;
     }
     m_timeNextCard.start();
+    m_timeCheckConnected.start();
+}
 
+void PiRFIDReader::timer_update()
+{
+    if(m_timeCheckConnected.elapsed()>100){
+        onCard = false;
+        m_timeCheckConnected.restart();
+    }
 }
