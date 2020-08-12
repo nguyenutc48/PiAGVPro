@@ -79,11 +79,13 @@ private:
     QMap<int,int>               m_gpioListIO;
     QVector<int>                listMCP23017Addr {0x20,0x21,0x22,0x23,0x24,0x25,0x26,0x27};
     bool                        Stop; //Stop scan
+    int                         inputMark;
+    int                         outputMark;
 
     //*************************************PRIVATE*********************************************************//
 private:
     void        run();
-    void        initSetup(QString);
+    bool        initSetup(QString);
     void        readConfig(QString);
     void        setState(int);
     void        setLog(QString);

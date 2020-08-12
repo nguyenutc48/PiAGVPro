@@ -44,8 +44,13 @@ void PIBoardIO::setY(QVector<bool> _y)
 
 void PIBoardIO::setY(int index, bool value)
 {
-    m_y[index] = value;
-    emit yChanged(index);
+    if(outputMark == 0)
+        value = !value;
+    if(m_y[index] != value){
+        m_y[index] = value;
+        digitalWrite(m_yAddres[index],value);
+        emit yChanged(index);
+    }
 }
 
 bool PIBoardIO::getY(int _index)
@@ -62,8 +67,12 @@ void PIBoardIO::setX(QVector<bool> _x)
 
 void PIBoardIO::setX(int index, bool value)
 {
-    m_x[index] = value;
-    emit xChanged(index);
+    if(inputMark == 0)
+        value = !value;
+    if(m_x[index] != value){
+        m_x[index] = value;
+        emit xChanged(index);
+    }
 }
 
 bool PIBoardIO::getX(int _index)
@@ -89,9 +98,12 @@ QMap<int, bool> PIBoardIO::getX(QVector<int> _X)
 
 void PIBoardIO::StartScan()
 {
-    Stop = false;
-    initSetup("/home/pi/PiAGVPro/boar_config.ini");
-    this->start();
+    if(m_oneScan != 1){
+        Stop = false;
+        bool check = initSetup("/home/pi/PiAGVPro/boar_config.ini");
+        if(check)
+            this->start();
+    }
 }
 
 void PIBoardIO::StopScan()
@@ -105,21 +117,23 @@ void PIBoardIO::run()
 {
     if(m_oneScan != 1)
     {
+        m_oneScan = 1;
         while(!Stop)
         {
             foreach (int inputAddr, m_xAddres.keys()) {
-                m_x[inputAddr] = digitalRead(m_xAddres[inputAddr]);
+                bool result = digitalRead(m_xAddres[inputAddr]);
+                setX(inputAddr,result);
             }
 
             foreach (int outputAddr, m_yAddres.keys()) {
-                digitalWrite(m_yAddres[outputAddr],m_y[outputAddr]);
+                setY(outputAddr,m_y[outputAddr]);
             }
             msleep(100);
         }
     }
 }
 
-void PIBoardIO::initSetup(QString dir)
+bool PIBoardIO::initSetup(QString dir)
 {
     readConfig(dir);
     wiringPiSetup();
@@ -130,6 +144,7 @@ void PIBoardIO::initSetup(QString dir)
         if(m_gpioListIO[gpio] == 1)
         {
             pinMode(m_gpioListIO.value(gpio),INPUT);
+            pullUpDnControl(m_gpioListIO.value(gpio),PUD_UP);
             m_xAddres[inputNumber] = gpio;
             m_x.append(OFF);
             inputNumber ++;
@@ -150,6 +165,7 @@ void PIBoardIO::initSetup(QString dir)
             if(ic_pin[pin] == 1)
             {
                 pinMode(ioI2CAddress,INPUT);
+                pullUpDnControl(ioI2CAddress,PUD_UP);
                 m_xAddres[inputNumber] = ioI2CAddress;
                 m_x.append(OFF);
                 inputNumber ++;
@@ -165,15 +181,24 @@ void PIBoardIO::initSetup(QString dir)
             ioI2CAddress ++;
         }
     }
+    if(m_xAddres.size() == 0 || m_yAddres.size() == 0)
+        return false;
+    else {
+        return true;
+    }
 }
 
 void PIBoardIO::readConfig(QString dir)
 {
     QSettings settings(dir,QSettings::IniFormat);
     foreach (QString group, settings.childGroups()) {
-
+        QStringList _group = group.split(':');
+        if(_group[0] == "INPUT")
+            inputMark = _group[1].toInt();
+        if(_group[0] == "OUTPUT")
+            outputMark = _group[1].toInt();
         //Code here [INPUT],[OUTPUT]
-        if(group == "INPUT" || group == "OUTPUT")
+        if(_group[0] == "INPUT" || _group[0] == "OUTPUT")
         {
             settings.beginGroup(group);
             foreach (QString childKey, settings.childKeys()) {
@@ -184,9 +209,9 @@ void PIBoardIO::readConfig(QString dir)
                 if(ic_type[0] == "gpio")
                 {
                     foreach (QString a, ic_pin_number) {
-                        if(group == "INPUT")
+                        if(_group[0] == "INPUT")
                             m_gpioListIO[a.toInt()] = 1;
-                        if(group == "OUTPUT")
+                        if(_group[0] == "OUTPUT")
                             m_gpioListIO[a.toInt()] = 0;
                     }
                 }
@@ -205,10 +230,10 @@ void PIBoardIO::readConfig(QString dir)
 
                     if(ic_pin_number[0] == "16"){
                         for (int i = 0; i < 16; i++) {
-                            if(group == "INPUT"){
+                            if(_group[0] == "INPUT"){
                                 data[i] = 1;
                             }
-                            if(group == "OUTPUT"){
+                            if(_group[0] == "OUTPUT"){
                                 data[i] = 0;
                             }
                             m_mcp23017ListIO[listMCP23017Addr[ic_addr]] = data;
@@ -218,10 +243,10 @@ void PIBoardIO::readConfig(QString dir)
                         foreach (QString pin, ic_pin_number) {
                             int pin_number = pin.toInt();
                             if(pin_number < 16){
-                                if(group == "INPUT"){
+                                if(_group[0] == "INPUT"){
                                     data[pin_number] = 1;
                                 }
-                                if(group == "OUTPUT"){
+                                if(_group[0] == "OUTPUT"){
                                     data[pin_number] = 0;
                                 }
                                 m_mcp23017ListIO[listMCP23017Addr[ic_addr]] = data;
