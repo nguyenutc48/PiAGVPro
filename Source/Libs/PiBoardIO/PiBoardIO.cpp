@@ -7,12 +7,22 @@ PIBoardIO::PIBoardIO(QObject *_parent,QString _config):
     QThread (_parent),
     configPath(_config)
 {
-    m_currentInAddr = 0;
-    m_currentOutAddr = 0;
 }
 
 PIBoardIO::~PIBoardIO()
 {
+    this->Stop = true;
+    msleep(1000);
+}
+
+int PIBoardIO::state()
+{
+    return m_state;
+}
+
+QString PIBoardIO::log()
+{
+    return m_log;
 }
 
 QVector<bool> PIBoardIO::x()
@@ -25,9 +35,11 @@ QVector<bool> PIBoardIO::y()
     return m_y;
 }
 
-void PIBoardIO::setY(QVector<bool>)
+void PIBoardIO::setY(QVector<bool> _y)
 {
-
+    foreach (bool Y, _y) {
+        m_y[_y.indexOf(Y)] = Y;
+    }
 }
 
 void PIBoardIO::setY(int index, bool value)
@@ -36,9 +48,16 @@ void PIBoardIO::setY(int index, bool value)
     emit yChanged(index);
 }
 
-void PIBoardIO::setX(QVector<bool>)
+bool PIBoardIO::getY(int _index)
 {
+    return m_y[_index];
+}
 
+void PIBoardIO::setX(QVector<bool> _x)
+{
+    foreach (bool X, _x) {
+        m_x[_x.indexOf(X)] = X;
+    }
 }
 
 void PIBoardIO::setX(int index, bool value)
@@ -47,19 +66,57 @@ void PIBoardIO::setX(int index, bool value)
     emit xChanged(index);
 }
 
+bool PIBoardIO::getX(int _index)
+{
+    return m_x[_index];
+}
+
+void PIBoardIO::setY(QMap<int, bool> _Y)
+{
+    foreach (int number, _Y.keys()) {
+        m_y[number] = _Y[number];
+    }
+}
+
+QMap<int, bool> PIBoardIO::getX(QVector<int> _X)
+{
+    QMap<int,bool> result;
+    foreach (int number, _X) {
+        result[number] = m_x[number];
+    }
+    return result;
+}
+
 void PIBoardIO::StartScan()
 {
+    Stop = false;
     initSetup("/home/pi/PiAGVPro/boar_config.ini");
+    this->start();
 }
 
 void PIBoardIO::StopScan()
 {
+    this->Stop = true;
+    msleep(1000);
 
 }
 
 void PIBoardIO::run()
 {
+    if(m_oneScan != 1)
+    {
+        while(!Stop)
+        {
+            foreach (int inputAddr, m_xAddres.keys()) {
+                m_x[inputAddr] = digitalRead(m_xAddres[inputAddr]);
+            }
 
+            foreach (int outputAddr, m_yAddres.keys()) {
+                digitalWrite(m_yAddres[outputAddr],m_y[outputAddr]);
+            }
+            msleep(100);
+        }
+    }
 }
 
 void PIBoardIO::initSetup(QString dir)
@@ -74,6 +131,7 @@ void PIBoardIO::initSetup(QString dir)
         {
             pinMode(m_gpioListIO.value(gpio),INPUT);
             m_xAddres[inputNumber] = gpio;
+            m_x.append(OFF);
             inputNumber ++;
         }
         if(m_gpioListIO[gpio] == 0)
@@ -81,6 +139,7 @@ void PIBoardIO::initSetup(QString dir)
             pinMode(m_gpioListIO.value(gpio),OUTPUT);
             digitalWrite(gpio,OFF);             // Clear cac trang thai khi init
             m_yAddres[outputNumber] = gpio;
+            m_y.append(OFF);
             outputNumber ++;
         }
     }
@@ -92,6 +151,7 @@ void PIBoardIO::initSetup(QString dir)
             {
                 pinMode(ioI2CAddress,INPUT);
                 m_xAddres[inputNumber] = ioI2CAddress;
+                m_x.append(OFF);
                 inputNumber ++;
             }
             if(ic_pin[pin] == 0)
@@ -99,6 +159,7 @@ void PIBoardIO::initSetup(QString dir)
                 pinMode(ioI2CAddress,OUTPUT);
                 digitalWrite(ioI2CAddress,OFF);     // Clear cac trang thai khi init
                 m_yAddres[outputNumber] = ioI2CAddress;
+                m_y.append(OFF);
                 outputNumber ++;
             }
             ioI2CAddress ++;
@@ -174,6 +235,24 @@ void PIBoardIO::readConfig(QString dir)
         }
     }
 
+}
+
+void PIBoardIO::setState(int _state)
+{
+    m_state = _state;
+    emit stateChanged(m_state);
+}
+
+void PIBoardIO::setLog(QString _log)
+{
+    m_log = _log;
+    emit logChanged(m_log);
+}
+
+void PIBoardIO::setStateLog(int _state, QString _log)
+{
+    setState(_state);
+    setLog(_log);
 }
 
 //void initSetup(QString dir)

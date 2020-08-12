@@ -25,6 +25,9 @@ class PIBoardIO : public QThread
     Q_PROPERTY(QVector<bool> x READ x WRITE setX NOTIFY xChanged)
     Q_PROPERTY(QVector<bool> y READ y WRITE setY NOTIFY yChanged)
 
+    Q_PROPERTY(int state READ state WRITE setState NOTIFY stateChanged)
+    Q_PROPERTY(QString log READ log WRITE setLog NOTIFY logChanged)
+
 public:
     //*********************************CONTRUCTOR**********************************************************//
     PIBoardIO(QObject *parent = nullptr,QString config = "/home/pi/board_config.ini");
@@ -33,21 +36,28 @@ public:
     //*************************************PUBLIC**********************************************************//
 public:
     QString             configPath;         //Dir config
-    QVector<QString>    listICSupport {"mcp23017","mcp23s17"};
-    QVector<int>        listMCP23017Addr {0x20,0x21,0x22,0x23,0x24,0x25,0x26,0x27};
 
     //*************************************PUBLIC FUNC*****************************************************//
 public:
-    QVector<bool>     x();
-    QVector<bool>     y();
-    void            setY(QVector<bool>);
-    void            setY(int,bool);                //Set gia tri bien Y
-    void            setX(QVector<bool>);
-    void            setX(int,bool);                //Set gia tri bien X
+    int                 state();
+    QString             log();
+    QVector<bool>       x();                            //Get all input
+    QVector<bool>       y();                            //Get all output
+    void                setY(QVector<bool>);            //Set list dau ra theo index cuar list truyen vao
+    void                setY(int,bool);                 //Set gia tri bien Y
+    bool                getY(int);                      //Get 1 dau ra
+    void                setX(QVector<bool>);            //Set list dau vao theo index cua list truyen vao
+    void                setX(int,bool);                 //Set gia tri bien X
+    bool                getX(int);                      //Get 1 dau vao
+    void                setY(QMap<int,bool>);           //Set list cac dau ra
+    QMap<int,bool>      getX(QVector<int>);             //Get list cac dau vao
     //*************************************SIGNAL**********************************************************//
 signals:
     void xChanged(int);
     void yChanged(int);
+    void stateChanged(int);
+    void logChanged(QString);
+
     //*************************************PUBLIC SlOT*****************************************************//
 public slots:
     void StartScan();
@@ -55,28 +65,29 @@ public slots:
 
     //*************************************STATIC PRIVATE**************************************************//
 private:
-    static  QVector<bool>         m_x;
-    static  QVector<bool>         m_y;
+    static  QVector<bool>       m_x;
+    static  QVector<bool>       m_y;
     //*************************************STATIC**********************************************************//
 private:
-    int             m_oneScan;
-    int             m_stopScan;
-    QMap<int,int>   m_xAddres;
-    QMap<int,int>   m_yAddres;
-    int             m_currentInAddr;
-    int             m_currentOutAddr;
-    int             m_currentInI2CAddr;
-    int             m_currentOutI2CAddr;
-    int             m_inputFirstI2CAddr;
-    int             m_outputFirstI2CAddr;
+    int                         m_state;
+    QString                     m_log;
+    int                         m_oneScan;
+    int                         m_stopScan;
+    QMap<int,int>               m_xAddres;
+    QMap<int,int>               m_yAddres;
     QMap<int,QMap<int,int>>     m_mcp23017ListIO;    //<diachii2c<pin_number,typeIO>>
     QMap<int,int>               m_gpioListIO;
+    QVector<int>                listMCP23017Addr {0x20,0x21,0x22,0x23,0x24,0x25,0x26,0x27};
+    bool                        Stop; //Stop scan
 
     //*************************************PRIVATE*********************************************************//
 private:
     void        run();
     void        initSetup(QString);
     void        readConfig(QString);
+    void        setState(int);
+    void        setLog(QString);
+    void        setStateLog(int,QString);
 
     //*************************************PRIVATE*********************************************************//
 private slots:
