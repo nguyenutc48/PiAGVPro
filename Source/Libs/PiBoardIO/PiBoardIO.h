@@ -1,3 +1,13 @@
+/* Config of file
+ * Cac dia chi dau vao ra thuc te phu thuoc vao thu tu tram
+ * gpio duoc dinh nghia uu tien cao nhat
+ * [INPUT:0]    // 0 la khi dau vao nhan duoc on can dao tin hieu
+ * mcp23017:0=0,1,2,3,4,5,6,7
+ * [OUTPUT:1]  // 1 co nghia la khi dung define ON khong can dao lai tin hieu
+ * mcp23017:0=8,9,10,11,12,13,14,15 //
+ * mcp23017:5=8,9,10,11,12,13
+ * */
+
 #ifndef PIBOARDIO_H
 #define PIBOARDIO_H
 

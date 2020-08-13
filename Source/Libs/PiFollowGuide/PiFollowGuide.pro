@@ -1,15 +1,15 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2020-07-23T13:15:33
+# Project created by QtCreator 2020-08-13T08:29:32
 #
 #-------------------------------------------------
 
 QT       -= gui
 
-TARGET = PiPWMBoard
+TARGET = PiFollowGuide
 TEMPLATE = lib
 
-DEFINES += PIPWMBOARD_LIBRARY
+DEFINES += PIFOLLOWGUIDE_LIBRARY
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings
@@ -23,11 +23,10 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-        PiPWMBoard.cpp
+        PiFollowGuide.cpp
 
 HEADERS += \
-        PiPWMBoard.h \
-        pipwmboard_global.h 
+        PiFollowGuide.h
 
 unix {
     target.path = /usr/lib

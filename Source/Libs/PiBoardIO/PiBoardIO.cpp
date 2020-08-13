@@ -193,10 +193,31 @@ void PIBoardIO::readConfig(QString dir)
     QSettings settings(dir,QSettings::IniFormat);
     foreach (QString group, settings.childGroups()) {
         QStringList _group = group.split(':');
-        if(_group[0] == "INPUT")
-            inputMark = _group[1].toInt();
-        if(_group[0] == "OUTPUT")
-            outputMark = _group[1].toInt();
+        if(_group.size() <= 1)
+        {
+            if(_group[0] == "INPUT")
+                inputMark = 1;
+            if(_group[0] == "OUTPUT")
+                outputMark = 1;
+        }
+        else {
+            if(_group[1].toInt() > 1)
+            {
+                if(_group[0] == "INPUT")
+                    inputMark = 1;
+                if(_group[0] == "OUTPUT")
+                    outputMark = 1;
+            }
+            else {
+                if(_group[0] == "INPUT")
+                    inputMark = _group[1].toInt();
+                if(_group[0] == "OUTPUT")
+                    outputMark = _group[1].toInt();
+            }
+
+        }
+
+
         //Code here [INPUT],[OUTPUT]
         if(_group[0] == "INPUT" || _group[0] == "OUTPUT")
         {
@@ -217,42 +238,48 @@ void PIBoardIO::readConfig(QString dir)
                 }
                 if(ic_type[0] == "mcp23017")
                 {
-                    int ic_addr = ic_type[1].toInt();
-                    QMap<int,int> data;
-                    if(m_mcp23017ListIO.find(listMCP23017Addr[ic_addr]).key() != listMCP23017Addr[ic_addr]){
-                        for (int i=0; i<16; i++) {
-                            data[i] = -1;
-                        }
-                    }
-                    else {
-                        data = m_mcp23017ListIO[listMCP23017Addr[ic_addr]];
-                    }
-
-                    if(ic_pin_number[0] == "16"){
-                        for (int i = 0; i < 16; i++) {
-                            if(_group[0] == "INPUT"){
-                                data[i] = 1;
-                            }
-                            if(_group[0] == "OUTPUT"){
-                                data[i] = 0;
-                            }
-                            m_mcp23017ListIO[listMCP23017Addr[ic_addr]] = data;
-                        }
-                    }
-                    else {
-                        foreach (QString pin, ic_pin_number) {
-                            int pin_number = pin.toInt();
-                            if(pin_number < 16){
-                                if(_group[0] == "INPUT"){
-                                    data[pin_number] = 1;
+                    if(ic_type.size() == 2)
+                    {
+                        int ic_addr = ic_type[1].toInt();
+                        if(ic_addr < 8)
+                        {
+                            QMap<int,int> data;
+                            if(m_mcp23017ListIO.find(listMCP23017Addr[ic_addr]).key() != listMCP23017Addr[ic_addr]){
+                                for (int i=0; i<16; i++) {
+                                    data[i] = -1;
                                 }
-                                if(_group[0] == "OUTPUT"){
-                                    data[pin_number] = 0;
+                            }
+                            else {
+                                data = m_mcp23017ListIO[listMCP23017Addr[ic_addr]];
+                            }
+
+                            if(ic_pin_number[0] == "16"){
+                                for (int i = 0; i < 16; i++) {
+                                    if(_group[0] == "INPUT"){
+                                        data[i] = 1;
+                                    }
+                                    if(_group[0] == "OUTPUT"){
+                                        data[i] = 0;
+                                    }
+                                    m_mcp23017ListIO[listMCP23017Addr[ic_addr]] = data;
                                 }
-                                m_mcp23017ListIO[listMCP23017Addr[ic_addr]] = data;
+                            }
+                            else {
+                                foreach (QString pin, ic_pin_number) {
+                                    int pin_number = pin.toInt();
+                                    if(pin_number < 16){
+                                        if(_group[0] == "INPUT"){
+                                            data[pin_number] = 1;
+                                        }
+                                        if(_group[0] == "OUTPUT"){
+                                            data[pin_number] = 0;
+                                        }
+                                        m_mcp23017ListIO[listMCP23017Addr[ic_addr]] = data;
+                                    }
+                                }
+
                             }
                         }
-
                     }
                 }
             }
