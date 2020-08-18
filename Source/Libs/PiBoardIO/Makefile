@@ -120,6 +120,7 @@ DIST          = /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/qt_config.prf \
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++/qmake.conf \
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/spec_post.prf \
+		.qmake.stash \
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/exclusive_builds.prf \
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/toolchain.prf \
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/default_pre.prf \
@@ -233,6 +234,7 @@ Makefile: PiBoardIO.pro /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++/qmake
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/qt_config.prf \
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++/qmake.conf \
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/spec_post.prf \
+		.qmake.stash \
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/exclusive_builds.prf \
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/toolchain.prf \
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/default_pre.prf \
@@ -320,6 +322,7 @@ Makefile: PiBoardIO.pro /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++/qmake
 /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/qt_config.prf:
 /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++/qmake.conf:
 /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/spec_post.prf:
+.qmake.stash:
 /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/exclusive_builds.prf:
 /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/toolchain.prf:
 /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/default_pre.prf:
@@ -433,9 +436,18 @@ uninstall_target: FORCE
 	-$(DEL_DIR) $(INSTALL_ROOT)/usr/lib/ 
 
 
-install: install_target  FORCE
+install_headers: first FORCE
+	@test -d $(INSTALL_ROOT)/usr/include || mkdir -p $(INSTALL_ROOT)/usr/include
+	-$(QINSTALL) /home/pi/PiAGVPro/Source/Libs/PiBoardIO/PiBoardIO.h $(INSTALL_ROOT)/usr/include/PiBoardIO.h
 
-uninstall: uninstall_target  FORCE
+uninstall_headers: FORCE
+	-$(DEL_FILE) -r $(INSTALL_ROOT)/usr/include/PiBoardIO.h
+	-$(DEL_DIR) $(INSTALL_ROOT)/usr/include/ 
+
+
+install: install_target install_headers  FORCE
+
+uninstall: uninstall_target uninstall_headers  FORCE
 
 FORCE:
 

@@ -26,10 +26,14 @@ SOURCES += \
         PiBoardIO.cpp
 
 HEADERS += \
-        PiBoardIO.h #\
-        #piboardio_global.h
+        PiBoardIO.h
 
 unix {
     target.path = /usr/lib
     INSTALLS += target
+}
+unix {
+    headers.path    = /usr/include
+    headers.files   += $$HEADERS
+    INSTALLS       += headers
 }

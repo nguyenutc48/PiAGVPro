@@ -27,10 +27,14 @@ SOURCES += \
         PiGuideReader.cpp
 
 HEADERS += \
-        PiGuideReader.h #\
-        #piguidereader_global.h
+        PiGuideReader.h
 
 unix {
     target.path = /usr/lib
     INSTALLS += target
+}
+unix {
+    headers.path    = /usr/include
+    headers.files   += $$HEADERS
+    INSTALLS       += headers
 }

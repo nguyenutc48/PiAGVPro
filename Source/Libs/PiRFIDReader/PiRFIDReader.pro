@@ -26,10 +26,14 @@ SOURCES += \
         PiRFIDReader.cpp
 
 HEADERS += \
-        PiRFIDReader.h #\
-        #pirfidreader_global.h
+        PiRFIDReader.h
 
 unix {
     target.path = /usr/lib
     INSTALLS += target
+}
+unix {
+    headers.path    = /usr/include
+    headers.files   += $$HEADERS
+    INSTALLS       += headers
 }
