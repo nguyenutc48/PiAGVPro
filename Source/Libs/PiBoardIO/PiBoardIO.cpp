@@ -175,6 +175,22 @@ int PIBoardIO::numberConvert(int index)
     return result - 1;
 }
 
+int PIBoardIO::addInput(int addr)
+{
+    int current_index = m_xAddres.size();
+    m_xAddres[current_index] = addr;
+    m_x.append(OFF);
+    return current_index;
+}
+
+int PIBoardIO::addOutput(int addr)
+{
+    int current_index = m_yAddres.size();
+    m_yAddres[current_index] = addr;
+    m_y.append(OFF);
+    return current_index;
+}
+
 
 void PIBoardIO::StartScan()
 {
@@ -235,12 +251,13 @@ void PIBoardIO::run()
                     double vref = m_analogAddrDAC[i].vref;
                     double dac = (analog*number_scale)/vref;
                     int digital = (int)dac;
-                    setSendSPIData(m_analogAddrDAC[i].pin_layout,digital);
+                    SPI_Custom pin = m_analogAddrDAC[i].pin_layout;
+                    setSendSPIData(pin, digital);
                     m_dacDataListOld[i] = analog;
                     emit dacChanged(i);
                 }
             }
-            msleep(100);
+            //msleep(100);
         }
         setStateLog(ERROR,"Dung scan hoac co loi phat sinh");
     }
@@ -260,7 +277,7 @@ bool PIBoardIO::initSetup(QString dir)
     int ioI2CAddress_Exten = I2C_START_ADDRESS;
     int inputNumber = 0;
     int outputNumber = 0;
-    if(!m_xAddres.isEmpty()){
+    if(!m_gpioListIO.isEmpty()){
         foreach (int gpio, m_gpioListIO.keys()) {
             if(m_gpioListIO[gpio] == 1)
             {
@@ -280,7 +297,7 @@ bool PIBoardIO::initSetup(QString dir)
             }
         }
     }
-    if(!m_yAddres.isEmpty()){
+    if(!m_mcp23017ListIO.isEmpty()){
         foreach (int mcpaddr, m_mcp23017ListIO.keys()) {
             mcp23017Setup(ioI2CAddress,mcpaddr);
             m_baseI2CStore[mcpaddr] = ioI2CAddress;
@@ -310,11 +327,16 @@ bool PIBoardIO::initSetup(QString dir)
     if(!m_mcp4921ListIO.isEmpty()){
         foreach (int mcp4921, m_mcp4921ListIO.keys()) {
             SPI_Custom ic_spi;
+            int yAddress = m_x.size();
             if(m_mcp4921ListIO[mcp4921].keys()[0] == 0){
                 ic_spi = m_mcp4921ListIO[mcp4921][0];
                 pinMode(ic_spi.sc_pin,OUTPUT);
+                //ic_spi.sc_pin = addOutput(ic_spi.sc_pin);
                 pinMode(ic_spi.sck_pin,OUTPUT);
+                //ic_spi.sck_pin = addOutput(ic_spi.sck_pin);
                 pinMode(ic_spi.data_pin,OUTPUT);
+                //ic_spi.data_pin = addOutput(ic_spi.data_pin);
+
             }
             else {
                 if(m_mcp23017ListIO.contains(m_mcp4921ListIO[mcp4921].keys()[0]) == true)
@@ -322,14 +344,20 @@ bool PIBoardIO::initSetup(QString dir)
                     int base_i2c = m_baseI2CStore[m_mcp4921ListIO[mcp4921].keys()[0]];
                     ic_spi = m_mcp4921ListIO[mcp4921][m_mcp4921ListIO[mcp4921].keys()[0]];
                     pinMode(base_i2c+ic_spi.sc_pin,OUTPUT);
+                    //ic_spi.sc_pin = addOutput(base_i2c+ic_spi.sc_pin);
                     pinMode(base_i2c+ic_spi.sck_pin,OUTPUT);
+                    //ic_spi.sck_pin = addOutput(base_i2c+ic_spi.sck_pin);
                     pinMode(base_i2c+ic_spi.data_pin,OUTPUT);
+                    //ic_spi.data_pin = addOutput(base_i2c+ic_spi.data_pin);
                 }
                 else {
                     mcp23017Setup(ioI2CAddress_Exten,m_mcp4921ListIO[mcp4921].keys()[0]);
                     pinMode(ioI2CAddress_Exten+ic_spi.sc_pin,OUTPUT);
+                    //ic_spi.sc_pin = addOutput(ioI2CAddress_Exten+ic_spi.sc_pin);
                     pinMode(ioI2CAddress_Exten+ic_spi.sck_pin,OUTPUT);
+                    //ic_spi.sck_pin = addOutput(ioI2CAddress_Exten+ic_spi.sck_pin);
                     pinMode(ioI2CAddress_Exten+ic_spi.data_pin,OUTPUT);
+                    //ic_spi.data_pin = addOutput(ioI2CAddress_Exten+ic_spi.data_pin);
                     ioI2CAddress_Exten+=16;
                 }
             }
@@ -475,6 +503,7 @@ void PIBoardIO::readConfig(QString dir)
                 DAC_SPI dac;
                 dac.vref = _group[1].toInt();
                 dac.scale = numberConvert(_group[2].toInt());
+                dac.addr = 0;
                 m_dacDataList.append(0);
                 if(ic_type[1] == "gpio")
                 {
@@ -544,8 +573,8 @@ void PIBoardIO::setStateLog(int _state, QString _log)
 
 void PIBoardIO::setSendSPIClock(int sck_pin)
 {
-    setY(sck_pin,ON);
-    setY(sck_pin,OFF);
+    digitalWrite(sck_pin,OFF);
+    digitalWrite(sck_pin,ON);
 }
 
 void PIBoardIO::setSendSPIHeader(int sck_pin,int data_pin)
@@ -553,39 +582,40 @@ void PIBoardIO::setSendSPIHeader(int sck_pin,int data_pin)
     // bit 15
     // 0 write to DAC *
     // 1 ignore command
-    setY(data_pin,OFF);
+    digitalWrite(data_pin,OFF);
     setSendSPIClock(sck_pin);
     // bit 14 Vref input buffer control
     // 0 unbuffered *
     // 1 buffered
-    setY(data_pin,OFF);
+    digitalWrite(data_pin,OFF);
     setSendSPIClock(sck_pin);
     // bit 13 Output Gain selection
     // 0 2x
     // 1 1x *
-    setY(data_pin,ON);
+    digitalWrite(data_pin,ON);
     setSendSPIClock(sck_pin);
     // bit 12 Output shutdown control bit
     // 0 Shutdown the device
     // 1 Active mode operation *
-    setY(data_pin,ON);
+    digitalWrite(data_pin,ON);
     setSendSPIClock(sck_pin);
 }
 
-void PIBoardIO::setSendSPIData(SPI_Custom pin, int data)
+void PIBoardIO::setSendSPIData(SPI_Custom pin, int32_t data)
 {
     // initiate data transfer with 4921
-    setY(pin.sc_pin,OFF);
+
+    digitalWrite(pin.sc_pin,OFF);
     // send 4 bit header
     setSendSPIHeader(pin.sck_pin,pin.data_pin);
     // send data
     for(int i = 11 ; i >= 0; i--)
     {
-        setY(pin.data_pin, ((data & (1<<i))) >> i);
+        digitalWrite(pin.data_pin, ((data & (1<<i))) >> i);
         setSendSPIClock(pin.sck_pin);
     }
     // finish data transfer
-    setY(pin.sc_pin,ON);
+    digitalWrite(pin.sc_pin,ON);
 }
 
 

@@ -436,9 +436,18 @@ uninstall_target: FORCE
 	-$(DEL_DIR) $(INSTALL_ROOT)/usr/lib/ 
 
 
-install: install_target  FORCE
+install_headers: first FORCE
+	@test -d $(INSTALL_ROOT)/usr/include || mkdir -p $(INSTALL_ROOT)/usr/include
+	-$(QINSTALL) /home/pi/PiAGVPro/Source/Libs/PiFollowGuide/PiFollowGuide.h $(INSTALL_ROOT)/usr/include/PiFollowGuide.h
 
-uninstall: uninstall_target  FORCE
+uninstall_headers: FORCE
+	-$(DEL_FILE) -r $(INSTALL_ROOT)/usr/include/PiFollowGuide.h
+	-$(DEL_DIR) $(INSTALL_ROOT)/usr/include/ 
+
+
+install: install_target install_headers  FORCE
+
+uninstall: uninstall_target uninstall_headers  FORCE
 
 FORCE:
 

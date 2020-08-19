@@ -181,6 +181,8 @@ private:
     void        setSendSPIHeader(int,int);
     void        setSendSPIData(SPI_Custom,int);
     int         numberConvert(int);
+    int         addInput(int);
+    int         addOutput(int);
 
 
     //*************************************PRIVATE*********************************************************//
