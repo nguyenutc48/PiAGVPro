@@ -82,6 +82,8 @@ public:
     //*************************************PUBLIC**********************************************************//
 public:
     QString             configPath;         //Dir config
+    int                 ADCChanelSelected;
+    int                 DACChanelSelected;
 
     //*************************************PUBLIC FUNC*****************************************************//
 public:
@@ -107,10 +109,6 @@ public:
     double              getAnalog();
     bool                setAnalog(double);  //
 
-    int                 ADCChanelSelected;
-    int                 DACChanelSelected;
-
-
     //*************************************SIGNAL**********************************************************//
 signals:
     void xChanged(int);
@@ -121,7 +119,6 @@ signals:
     void adcChanged(int);
     void dacChanged(int);
     void analogChanged(double);
-
 
     //*************************************PUBLIC SlOT*****************************************************//
 public slots:
@@ -168,7 +165,6 @@ private:
     QMap<int,QMap<int,ADC>>     m_pcf8591Config;        //Save config DAC
     QVector<double>             m_dacDataListOld;       //Old list dac
 
-
     //*************************************PRIVATE*********************************************************//
 private:
     void        run();
@@ -183,7 +179,6 @@ private:
     int         numberConvert(int);
     int         addInput(int);
     int         addOutput(int);
-
 
     //*************************************PRIVATE*********************************************************//
 private slots:

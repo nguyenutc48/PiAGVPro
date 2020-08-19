@@ -327,7 +327,6 @@ bool PIBoardIO::initSetup(QString dir)
     if(!m_mcp4921ListIO.isEmpty()){
         foreach (int mcp4921, m_mcp4921ListIO.keys()) {
             SPI_Custom ic_spi;
-            int yAddress = m_x.size();
             if(m_mcp4921ListIO[mcp4921].keys()[0] == 0){
                 ic_spi = m_mcp4921ListIO[mcp4921][0];
                 pinMode(ic_spi.sc_pin,OUTPUT);
