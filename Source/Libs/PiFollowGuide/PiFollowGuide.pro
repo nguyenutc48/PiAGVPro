@@ -5,6 +5,7 @@
 #-------------------------------------------------
 
 QT       -= gui
+QT      += serialport
 
 TARGET = PiFollowGuide
 TEMPLATE = lib
@@ -23,10 +24,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-        PiFollowGuide.cpp
+        PiFollowGuide.cpp \
+    PID.cpp \
+    LMotorController.cpp
 
 HEADERS += \
-        PiFollowGuide.h
+        PiFollowGuide.h \
+    PID.h \
+    LMotorController.h
 
 unix {
     target.path = /usr/lib
@@ -36,4 +41,11 @@ unix {
     headers.path    = /usr/include
     headers.files   += $$HEADERS
     INSTALLS       += headers
+}
+
+unix {
+    DEFINES += UNIX
+    INCLUDEPATH += /usr/local/include/
+    LIBS += -L/usr/lib -lPiGuideReader
+    LIBS += -L/usr/lib -lPiBoardIO
 }

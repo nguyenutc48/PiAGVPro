@@ -30,10 +30,12 @@
 #define I2C_ANALOG_ADDRESS 300
 #define ON  1
 #define OFF 0
+#define DIGITAL_INPUT   true
+#define ANALOG_INPUT    false
 
 
 
-class PIBoardIO : public QThread
+class PiBoardIO : public QThread
 {
     Q_OBJECT
     //*********************************PROPERTIES**********************************************************//
@@ -48,8 +50,8 @@ class PIBoardIO : public QThread
 
 public:
     //*********************************CONTRUCTOR**********************************************************//
-    PIBoardIO(QObject *parent = nullptr,QString config = "/home/pi/board_config.ini");
-    ~PIBoardIO();
+    PiBoardIO(QObject *parent = nullptr,QString config = "/home/pi/board_config.ini");
+    ~PiBoardIO();
 
     enum {
         RUNNING,
@@ -57,6 +59,12 @@ public:
         INITIO,
         ERROR
     } State;
+
+    enum{
+      ADC_Type,
+      DAC_Type
+    } AnalogType;
+
 
     struct SPI_Custom{
         int sc_pin;
@@ -84,6 +92,7 @@ public:
     QString             configPath;         //Dir config
     int                 ADCChanelSelected;
     int                 DACChanelSelected;
+    bool                DigitalInput = true;
 
     //*************************************PUBLIC FUNC*****************************************************//
 public:
@@ -108,6 +117,13 @@ public:
     bool                setAnalog(int,double);  //
     double              getAnalog();
     bool                setAnalog(double);  //
+    int                 getInputAddress(int);
+    int                 getOutputAddress(int);
+
+    //Display
+    int                 getMaxRate(int,int);
+    int                 getMaxDigitalRate(int,int);
+
 
     //*************************************SIGNAL**********************************************************//
 signals:

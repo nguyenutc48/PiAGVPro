@@ -21,18 +21,18 @@
 QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
-struct qt_meta_stringdata_PIBoardIO_t {
+struct qt_meta_stringdata_PiBoardIO_t {
     QByteArrayData data[20];
     char stringdata0[170];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
-    qptrdiff(offsetof(qt_meta_stringdata_PIBoardIO_t, stringdata0) + ofs \
+    qptrdiff(offsetof(qt_meta_stringdata_PiBoardIO_t, stringdata0) + ofs \
         - idx * sizeof(QByteArrayData)) \
     )
-static const qt_meta_stringdata_PIBoardIO_t qt_meta_stringdata_PIBoardIO = {
+static const qt_meta_stringdata_PiBoardIO_t qt_meta_stringdata_PiBoardIO = {
     {
-QT_MOC_LITERAL(0, 0, 9), // "PIBoardIO"
+QT_MOC_LITERAL(0, 0, 9), // "PiBoardIO"
 QT_MOC_LITERAL(1, 10, 8), // "xChanged"
 QT_MOC_LITERAL(2, 19, 0), // ""
 QT_MOC_LITERAL(3, 20, 8), // "yChanged"
@@ -54,7 +54,7 @@ QT_MOC_LITERAL(18, 160, 5), // "state"
 QT_MOC_LITERAL(19, 166, 3) // "log"
 
     },
-    "PIBoardIO\0xChanged\0\0yChanged\0stateChanged\0"
+    "PiBoardIO\0xChanged\0\0yChanged\0stateChanged\0"
     "logChanged\0adcChanged\0dacChanged\0"
     "analogChanged\0StartScan\0StopScan\0"
     "analogSet\0x\0QVector<bool>\0y\0adc\0"
@@ -62,7 +62,7 @@ QT_MOC_LITERAL(19, 166, 3) // "log"
 };
 #undef QT_MOC_LITERAL
 
-static const uint qt_meta_data_PIBoardIO[] = {
+static const uint qt_meta_data_PiBoardIO[] = {
 
  // content:
        7,       // revision
@@ -122,10 +122,10 @@ static const uint qt_meta_data_PIBoardIO[] = {
        0        // eod
 };
 
-void PIBoardIO::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
+void PiBoardIO::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        PIBoardIO *_t = static_cast<PIBoardIO *>(_o);
+        PiBoardIO *_t = static_cast<PiBoardIO *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->xChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
@@ -143,50 +143,50 @@ void PIBoardIO::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, v
     } else if (_c == QMetaObject::IndexOfMethod) {
         int *result = reinterpret_cast<int *>(_a[0]);
         {
-            using _t = void (PIBoardIO::*)(int );
-            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&PIBoardIO::xChanged)) {
+            using _t = void (PiBoardIO::*)(int );
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&PiBoardIO::xChanged)) {
                 *result = 0;
                 return;
             }
         }
         {
-            using _t = void (PIBoardIO::*)(int );
-            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&PIBoardIO::yChanged)) {
+            using _t = void (PiBoardIO::*)(int );
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&PiBoardIO::yChanged)) {
                 *result = 1;
                 return;
             }
         }
         {
-            using _t = void (PIBoardIO::*)(int );
-            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&PIBoardIO::stateChanged)) {
+            using _t = void (PiBoardIO::*)(int );
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&PiBoardIO::stateChanged)) {
                 *result = 2;
                 return;
             }
         }
         {
-            using _t = void (PIBoardIO::*)(QString );
-            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&PIBoardIO::logChanged)) {
+            using _t = void (PiBoardIO::*)(QString );
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&PiBoardIO::logChanged)) {
                 *result = 3;
                 return;
             }
         }
         {
-            using _t = void (PIBoardIO::*)(int );
-            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&PIBoardIO::adcChanged)) {
+            using _t = void (PiBoardIO::*)(int );
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&PiBoardIO::adcChanged)) {
                 *result = 4;
                 return;
             }
         }
         {
-            using _t = void (PIBoardIO::*)(int );
-            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&PIBoardIO::dacChanged)) {
+            using _t = void (PiBoardIO::*)(int );
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&PiBoardIO::dacChanged)) {
                 *result = 5;
                 return;
             }
         }
         {
-            using _t = void (PIBoardIO::*)(double );
-            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&PIBoardIO::analogChanged)) {
+            using _t = void (PiBoardIO::*)(double );
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&PiBoardIO::analogChanged)) {
                 *result = 6;
                 return;
             }
@@ -205,7 +205,7 @@ void PIBoardIO::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, v
 
 #ifndef QT_NO_PROPERTIES
     else if (_c == QMetaObject::ReadProperty) {
-        PIBoardIO *_t = static_cast<PIBoardIO *>(_o);
+        PiBoardIO *_t = static_cast<PiBoardIO *>(_o);
         Q_UNUSED(_t)
         void *_v = _a[0];
         switch (_id) {
@@ -218,7 +218,7 @@ void PIBoardIO::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, v
         default: break;
         }
     } else if (_c == QMetaObject::WriteProperty) {
-        PIBoardIO *_t = static_cast<PIBoardIO *>(_o);
+        PiBoardIO *_t = static_cast<PiBoardIO *>(_o);
         Q_UNUSED(_t)
         void *_v = _a[0];
         switch (_id) {
@@ -235,26 +235,26 @@ void PIBoardIO::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, v
 #endif // QT_NO_PROPERTIES
 }
 
-QT_INIT_METAOBJECT const QMetaObject PIBoardIO::staticMetaObject = {
-    { &QThread::staticMetaObject, qt_meta_stringdata_PIBoardIO.data,
-      qt_meta_data_PIBoardIO,  qt_static_metacall, nullptr, nullptr}
+QT_INIT_METAOBJECT const QMetaObject PiBoardIO::staticMetaObject = {
+    { &QThread::staticMetaObject, qt_meta_stringdata_PiBoardIO.data,
+      qt_meta_data_PiBoardIO,  qt_static_metacall, nullptr, nullptr}
 };
 
 
-const QMetaObject *PIBoardIO::metaObject() const
+const QMetaObject *PiBoardIO::metaObject() const
 {
     return QObject::d_ptr->metaObject ? QObject::d_ptr->dynamicMetaObject() : &staticMetaObject;
 }
 
-void *PIBoardIO::qt_metacast(const char *_clname)
+void *PiBoardIO::qt_metacast(const char *_clname)
 {
     if (!_clname) return nullptr;
-    if (!strcmp(_clname, qt_meta_stringdata_PIBoardIO.stringdata0))
+    if (!strcmp(_clname, qt_meta_stringdata_PiBoardIO.stringdata0))
         return static_cast<void*>(this);
     return QThread::qt_metacast(_clname);
 }
 
-int PIBoardIO::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
+int PiBoardIO::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 {
     _id = QThread::qt_metacall(_c, _id, _a);
     if (_id < 0)
@@ -289,49 +289,49 @@ int PIBoardIO::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 }
 
 // SIGNAL 0
-void PIBoardIO::xChanged(int _t1)
+void PiBoardIO::xChanged(int _t1)
 {
     void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 0, _a);
 }
 
 // SIGNAL 1
-void PIBoardIO::yChanged(int _t1)
+void PiBoardIO::yChanged(int _t1)
 {
     void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 1, _a);
 }
 
 // SIGNAL 2
-void PIBoardIO::stateChanged(int _t1)
+void PiBoardIO::stateChanged(int _t1)
 {
     void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 2, _a);
 }
 
 // SIGNAL 3
-void PIBoardIO::logChanged(QString _t1)
+void PiBoardIO::logChanged(QString _t1)
 {
     void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 3, _a);
 }
 
 // SIGNAL 4
-void PIBoardIO::adcChanged(int _t1)
+void PiBoardIO::adcChanged(int _t1)
 {
     void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 4, _a);
 }
 
 // SIGNAL 5
-void PIBoardIO::dacChanged(int _t1)
+void PiBoardIO::dacChanged(int _t1)
 {
     void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 5, _a);
 }
 
 // SIGNAL 6
-void PIBoardIO::analogChanged(double _t1)
+void PiBoardIO::analogChanged(double _t1)
 {
     void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 6, _a);

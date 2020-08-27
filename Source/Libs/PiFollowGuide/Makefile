@@ -12,10 +12,10 @@ MAKEFILE      = Makefile
 
 CC            = gcc
 CXX           = g++
-DEFINES       = -DPIFOLLOWGUIDE_LIBRARY -DQT_DEPRECATED_WARNINGS -DQT_QML_DEBUG -DQT_CORE_LIB
+DEFINES       = -DPIFOLLOWGUIDE_LIBRARY -DQT_DEPRECATED_WARNINGS -DUNIX -DQT_QML_DEBUG -DQT_SERIALPORT_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -g -Wall -W -D_REENTRANT -fPIC $(DEFINES)
 CXXFLAGS      = -pipe -g -Wall -W -D_REENTRANT -fPIC $(DEFINES)
-INCPATH       = -I. -isystem /usr/include/arm-linux-gnueabihf/qt5 -isystem /usr/include/arm-linux-gnueabihf/qt5/QtCore -I. -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++
+INCPATH       = -I. -isystem /usr/local/include -isystem /usr/include/arm-linux-gnueabihf/qt5 -isystem /usr/include/arm-linux-gnueabihf/qt5/QtSerialPort -isystem /usr/include/arm-linux-gnueabihf/qt5/QtCore -I. -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++
 QMAKE         = /usr/lib/qt5/bin/qmake
 DEL_FILE      = rm -f
 CHK_DIR_EXISTS= test -d
@@ -38,7 +38,7 @@ DISTNAME      = PiFollowGuide1.0.0
 DISTDIR = /home/pi/PiAGVPro/Source/Libs/PiFollowGuide/.tmp/PiFollowGuide1.0.0
 LINK          = g++
 LFLAGS        = -shared -Wl,-soname,libPiFollowGuide.so.1
-LIBS          = $(SUBLIBS) -lQt5Core -lpthread -latomic 
+LIBS          = $(SUBLIBS) -L/usr/lib -lPiGuideReader -lPiBoardIO -lQt5SerialPort -lQt5Core -lpthread -latomic 
 AR            = ar cqs
 RANLIB        = 
 SED           = sed
@@ -50,8 +50,10 @@ OBJECTS_DIR   = ./
 
 ####### Files
 
-SOURCES       = PiFollowGuide.cpp moc_PiFollowGuide.cpp
+SOURCES       = PiFollowGuide.cpp \
+		PID.cpp moc_PiFollowGuide.cpp
 OBJECTS       = PiFollowGuide.o \
+		PID.o \
 		moc_PiFollowGuide.o
 DIST          = /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/common/unix.conf \
@@ -138,7 +140,9 @@ DIST          = /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/exceptions.prf \
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/yacc.prf \
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/lex.prf \
-		PiFollowGuide.pro PiFollowGuide.h PiFollowGuide.cpp
+		PiFollowGuide.pro PiFollowGuide.h \
+		PID.h PiFollowGuide.cpp \
+		PID.cpp
 QMAKE_TARGET  = PiFollowGuide
 DESTDIR       = 
 TARGET        = libPiFollowGuide.so.1.0.0
@@ -253,6 +257,7 @@ Makefile: PiFollowGuide.pro /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++/q
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/yacc.prf \
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/lex.prf \
 		PiFollowGuide.pro \
+		/usr/lib/arm-linux-gnueabihf/libQt5SerialPort.prl \
 		/usr/lib/arm-linux-gnueabihf/libQt5Core.prl
 	$(QMAKE) -o Makefile PiFollowGuide.pro -spec linux-g++ CONFIG+=debug CONFIG+=qml_debug
 /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/spec_pre.prf:
@@ -341,6 +346,7 @@ Makefile: PiFollowGuide.pro /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++/q
 /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/yacc.prf:
 /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/lex.prf:
 PiFollowGuide.pro:
+/usr/lib/arm-linux-gnueabihf/libQt5SerialPort.prl:
 /usr/lib/arm-linux-gnueabihf/libQt5Core.prl:
 qmake: FORCE
 	@$(QMAKE) -o Makefile PiFollowGuide.pro -spec linux-g++ CONFIG+=debug CONFIG+=qml_debug
@@ -357,8 +363,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents PiFollowGuide.h $(DISTDIR)/
-	$(COPY_FILE) --parents PiFollowGuide.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents PiFollowGuide.h PID.h $(DISTDIR)/
+	$(COPY_FILE) --parents PiFollowGuide.cpp PID.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -397,7 +403,7 @@ compiler_moc_header_clean:
 moc_PiFollowGuide.cpp: PiFollowGuide.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
-	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/pi/PiAGVPro/Source/Libs/PiFollowGuide/moc_predefs.h -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/pi/PiAGVPro/Source/Libs/PiFollowGuide -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/8 -I/usr/include/arm-linux-gnueabihf/c++/8 -I/usr/include/c++/8/backward -I/usr/lib/gcc/arm-linux-gnueabihf/8/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/8/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include PiFollowGuide.h -o moc_PiFollowGuide.cpp
+	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/pi/PiAGVPro/Source/Libs/PiFollowGuide/moc_predefs.h -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/pi/PiAGVPro/Source/Libs/PiFollowGuide -I/usr/local/include -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtSerialPort -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/8 -I/usr/include/arm-linux-gnueabihf/c++/8 -I/usr/include/c++/8/backward -I/usr/lib/gcc/arm-linux-gnueabihf/8/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/8/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include PiFollowGuide.h -o moc_PiFollowGuide.cpp
 
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
@@ -415,6 +421,9 @@ compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean
 
 PiFollowGuide.o: PiFollowGuide.cpp PiFollowGuide.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o PiFollowGuide.o PiFollowGuide.cpp
+
+PID.o: PID.cpp PID.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o PID.o PID.cpp
 
 moc_PiFollowGuide.o: moc_PiFollowGuide.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_PiFollowGuide.o moc_PiFollowGuide.cpp
@@ -439,8 +448,10 @@ uninstall_target: FORCE
 install_headers: first FORCE
 	@test -d $(INSTALL_ROOT)/usr/include || mkdir -p $(INSTALL_ROOT)/usr/include
 	-$(QINSTALL) /home/pi/PiAGVPro/Source/Libs/PiFollowGuide/PiFollowGuide.h $(INSTALL_ROOT)/usr/include/PiFollowGuide.h
+	-$(QINSTALL) /home/pi/PiAGVPro/Source/Libs/PiFollowGuide/PID.h $(INSTALL_ROOT)/usr/include/PID.h
 
 uninstall_headers: FORCE
+	-$(DEL_FILE) -r $(INSTALL_ROOT)/usr/include/PID.h
 	-$(DEL_FILE) -r $(INSTALL_ROOT)/usr/include/PiFollowGuide.h
 	-$(DEL_DIR) $(INSTALL_ROOT)/usr/include/ 
 

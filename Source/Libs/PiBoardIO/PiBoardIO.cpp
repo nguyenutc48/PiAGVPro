@@ -1,11 +1,11 @@
 #include "PiBoardIO.h"
 
-QVector<bool>     PIBoardIO::m_x;
-QVector<bool>     PIBoardIO::m_y;
-QVector<double>   PIBoardIO::m_adcDataList;
-QVector<double>   PIBoardIO::m_dacDataList;
+QVector<bool>     PiBoardIO::m_x;
+QVector<bool>     PiBoardIO::m_y;
+QVector<double>   PiBoardIO::m_adcDataList;
+QVector<double>   PiBoardIO::m_dacDataList;
 
-PIBoardIO::PIBoardIO(QObject *_parent,QString _config):
+PiBoardIO::PiBoardIO(QObject *_parent,QString _config):
     QThread (_parent),
     configPath(_config)
 {
@@ -13,40 +13,40 @@ PIBoardIO::PIBoardIO(QObject *_parent,QString _config):
     DACChanelSelected = 0;
 }
 
-PIBoardIO::~PIBoardIO()
+PiBoardIO::~PiBoardIO()
 {
     this->m_Stop = true;
     msleep(500);
 }
 
-int PIBoardIO::state()
+int PiBoardIO::state()
 {
     return m_state;
 }
 
-QString PIBoardIO::log()
+QString PiBoardIO::log()
 {
     return m_log;
 }
 
-QVector<bool> PIBoardIO::x()
+QVector<bool> PiBoardIO::x()
 {
     return m_x;
 }
 
-QVector<bool> PIBoardIO::y()
+QVector<bool> PiBoardIO::y()
 {
     return m_y;
 }
 
-void PIBoardIO::setY(QVector<bool> _y)
+void PiBoardIO::setY(QVector<bool> _y)
 {
     foreach (bool Y, _y) {
         m_y[_y.indexOf(Y)] = Y;
     }
 }
 
-void PIBoardIO::setY(int index, bool value)
+void PiBoardIO::setY(int index, bool value)
 {
     if(m_outputMark == 0)
         value = !value;
@@ -57,19 +57,19 @@ void PIBoardIO::setY(int index, bool value)
     }
 }
 
-bool PIBoardIO::getY(int _index)
+bool PiBoardIO::getY(int _index)
 {
     return m_y[_index];
 }
 
-void PIBoardIO::setX(QVector<bool> _x)
+void PiBoardIO::setX(QVector<bool> _x)
 {
     foreach (bool X, _x) {
         m_x[_x.indexOf(X)] = X;
     }
 }
 
-void PIBoardIO::setX(int index, bool value)
+void PiBoardIO::setX(int index, bool value)
 {
     if(m_inputMark == 0)
         value = !value;
@@ -79,19 +79,19 @@ void PIBoardIO::setX(int index, bool value)
     }
 }
 
-bool PIBoardIO::getX(int _index)
+bool PiBoardIO::getX(int _index)
 {
     return m_x[_index];
 }
 
-void PIBoardIO::setY(QMap<int, bool> _Y)
+void PiBoardIO::setY(QMap<int, bool> _Y)
 {
     foreach (int number, _Y.keys()) {
         m_y[number] = _Y[number];
     }
 }
 
-QMap<int, bool> PIBoardIO::getX(QVector<int> _X)
+QMap<int, bool> PiBoardIO::getX(QVector<int> _X)
 {
     QMap<int,bool> result;
     foreach (int number, _X) {
@@ -100,27 +100,27 @@ QMap<int, bool> PIBoardIO::getX(QVector<int> _X)
     return result;
 }
 
-QVector<double> PIBoardIO::adc()
+QVector<double> PiBoardIO::adc()
 {
     return m_adcDataList;
 }
 
-QVector<double> PIBoardIO::dac()
+QVector<double> PiBoardIO::dac()
 {
     return m_dacDataList;
 }
 
-void PIBoardIO::setAdc(QVector<double> data)
+void PiBoardIO::setAdc(QVector<double> data)
 {
     m_adcDataList = data;
 }
 
-void PIBoardIO::setDac(QVector<double> data)
+void PiBoardIO::setDac(QVector<double> data)
 {
     m_dacDataList = data;
 }
 
-double PIBoardIO::getAnalog(int cn)
+double PiBoardIO::getAnalog(int cn)
 {
     if(!m_adcDataList.isEmpty())
     {
@@ -134,13 +134,13 @@ double PIBoardIO::getAnalog(int cn)
     }
 }
 
-bool PIBoardIO::setAnalog(int cn, double data)
+bool PiBoardIO::setAnalog(int cn, double data)
 {
     if(!m_dacDataList.isEmpty())
     {
         if(cn<m_dacDataList.size())
         {
-            if(m_dacDataList[cn] != data)
+            if(m_dacDataList.value(cn) != data)
             {
                 m_dacDataList[cn] = data;
             }
@@ -155,18 +155,58 @@ bool PIBoardIO::setAnalog(int cn, double data)
     }
 }
 
-double PIBoardIO::getAnalog()
+double PiBoardIO::getAnalog()
 {
     return getAnalog(0);
 }
 
-bool PIBoardIO::setAnalog(double data)
+bool PiBoardIO::setAnalog(double data)
 {
     return setAnalog(0,data);
 }
 
+int PiBoardIO::getInputAddress(int index)
+{
+    return m_xAddres[index];
+}
 
-int PIBoardIO::numberConvert(int index)
+int PiBoardIO::getOutputAddress(int index)
+{
+    return m_yAddres[index];
+}
+
+int PiBoardIO::getMaxRate(int type, int chanel)
+{
+    switch (type) {
+    case ADC_Type:
+        return m_analogAddr[chanel].vref;
+        break;
+    case DAC_Type:
+        return m_analogAddrDAC[chanel].vref;
+        break;
+    default:
+        break;
+    }
+    return -1;
+}
+
+int PiBoardIO::getMaxDigitalRate(int type, int chanel)
+{
+    switch (type) {
+    case ADC_Type:
+        return m_analogAddr[chanel].scale;
+        break;
+    case DAC_Type:
+        return m_analogAddrDAC[chanel].scale;
+        break;
+    default:
+        break;
+    }
+    return -1;
+}
+
+
+int PiBoardIO::numberConvert(int index)
 {
     int result = 1;
     for (int i =0; i<index; i++) {
@@ -175,7 +215,7 @@ int PIBoardIO::numberConvert(int index)
     return result - 1;
 }
 
-int PIBoardIO::addInput(int addr)
+int PiBoardIO::addInput(int addr)
 {
     int current_index = m_xAddres.size();
     m_xAddres[current_index] = addr;
@@ -183,7 +223,7 @@ int PIBoardIO::addInput(int addr)
     return current_index;
 }
 
-int PIBoardIO::addOutput(int addr)
+int PiBoardIO::addOutput(int addr)
 {
     int current_index = m_yAddres.size();
     m_yAddres[current_index] = addr;
@@ -192,7 +232,7 @@ int PIBoardIO::addOutput(int addr)
 }
 
 
-void PIBoardIO::StartScan()
+void PiBoardIO::StartScan()
 {
     if(m_oneScan != 1){
         m_Stop = false;
@@ -202,18 +242,18 @@ void PIBoardIO::StartScan()
     }
 }
 
-void PIBoardIO::StopScan()
+void PiBoardIO::StopScan()
 {
     this->m_Stop = true;
     msleep(500);
 }
 
-void PIBoardIO::analogSet(double data)
+void PiBoardIO::analogSet(double data)
 {
     setAnalog(DACChanelSelected,data);
 }
 
-void PIBoardIO::run()
+void PiBoardIO::run()
 {
     if(m_oneScan != 1)
     {
@@ -249,8 +289,15 @@ void PIBoardIO::run()
                     double analog = m_dacDataList[i];
                     int number_scale = m_analogAddrDAC[i].scale;
                     double vref = m_analogAddrDAC[i].vref;
-                    double dac = (analog*number_scale)/vref;
-                    int digital = (int)dac;
+                    int digital = 0;
+                    if(DigitalInput)
+                    {
+                        digital = analog;
+                    }
+                    else {
+                        double dac = (analog*number_scale)/vref;
+                        digital = (int)dac;
+                    }
                     SPI_Custom pin = m_analogAddrDAC[i].pin_layout;
                     setSendSPIData(pin, digital);
                     m_dacDataListOld[i] = analog;
@@ -263,7 +310,7 @@ void PIBoardIO::run()
     }
 }
 
-bool PIBoardIO::initSetup(QString dir)
+bool PiBoardIO::initSetup(QString dir)
 {
     readConfig(dir);
     setStateLog(INITIO,"Khoi tao dau vao va dau ra cho mach");
@@ -362,7 +409,7 @@ bool PIBoardIO::initSetup(QString dir)
             }
             m_analogAddrDAC[m_mcp4921ListIO.keys().indexOf(mcp4921)].pin_layout = ic_spi;
             m_spiPins.insert(m_mcp4921ListIO.keys().indexOf(mcp4921),ic_spi);
-            m_dacDataList.append(0);
+            //m_dacDataList.append(0);
             m_dacDataListOld.append(0);
         }
     }
@@ -377,7 +424,7 @@ bool PIBoardIO::initSetup(QString dir)
                 adc.vref = m_pcf8591Config[addr][pin].vref;
                 adc.scale = numberConvert(m_pcf8591Config[addr][pin].scale);
                 m_analogAddr.append(adc);
-                m_adcDataList.append(0);
+                //m_adcDataList.append(0);
             }
             analogAddress += 16;
         }
@@ -385,7 +432,7 @@ bool PIBoardIO::initSetup(QString dir)
     return true;
 }
 
-void PIBoardIO::readConfig(QString dir)
+void PiBoardIO::readConfig(QString dir)
 {
     setStateLog(READCONFIG,"Dang doc config file");
     QSettings settings(dir,QSettings::IniFormat);
@@ -550,19 +597,19 @@ void PIBoardIO::readConfig(QString dir)
 
 }
 
-void PIBoardIO::setState(int _state)
+void PiBoardIO::setState(int _state)
 {
     m_state = _state;
     emit stateChanged(m_state);
 }
 
-void PIBoardIO::setLog(QString _log)
+void PiBoardIO::setLog(QString _log)
 {
     m_log = _log;
     emit logChanged(m_log);
 }
 
-void PIBoardIO::setStateLog(int _state, QString _log)
+void PiBoardIO::setStateLog(int _state, QString _log)
 {
     setState(_state);
     setLog(_log);
@@ -570,13 +617,13 @@ void PIBoardIO::setStateLog(int _state, QString _log)
 
 
 
-void PIBoardIO::setSendSPIClock(int sck_pin)
+void PiBoardIO::setSendSPIClock(int sck_pin)
 {
     digitalWrite(sck_pin,OFF);
     digitalWrite(sck_pin,ON);
 }
 
-void PIBoardIO::setSendSPIHeader(int sck_pin,int data_pin)
+void PiBoardIO::setSendSPIHeader(int sck_pin,int data_pin)
 {
     // bit 15
     // 0 write to DAC *
@@ -600,7 +647,7 @@ void PIBoardIO::setSendSPIHeader(int sck_pin,int data_pin)
     setSendSPIClock(sck_pin);
 }
 
-void PIBoardIO::setSendSPIData(SPI_Custom pin, int32_t data)
+void PiBoardIO::setSendSPIData(SPI_Custom pin, int32_t data)
 {
     // initiate data transfer with 4921
 
